@@ -12,6 +12,8 @@ class MainPage (webapp2.RequestHandler):
 			# self.response.headers['Content-Type'] = 'text/html; charset=uft-8'
 			# self.response.write('Hello, '+ user.nickname())
 			greeting = ('Welcome, %s (<a href="%s"> Sign Out </a>)' % (user.nickname(), users.create_logout_url('/')))
+			if(users.is_current_user_admin()):
+				greeting=greeting+ '<a href="/admin"> Go to admin</a>'
 		else:
 			greeting = ('<a href="%s"> Sign in or register </a>' % (users.create_login_url('/')))
 			#self.redirect(users.create_login_url(self.request.uri))
