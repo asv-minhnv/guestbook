@@ -1,8 +1,17 @@
 import cgi
+import  os
 import urllib
 from google.appengine.api import users
 from google.appengine.ext import ndb
 import webapp2
+import jinja2
+
+
+JINJA_EVIROMENT = jinja2.Environment(
+	loader=jinja2.FileSystemLoader(os.path.dirname(__file__)),
+	extensions=['jinja2.ext.autoescape'],
+	autoescape=True
+)
 
 
 MAIN_PAGE_FOOTER_TEMPLATE= """\
@@ -40,28 +49,38 @@ class Greeting(ndb.Model):
 
 class MainPage(webapp2.RequestHandler):
 	def get(self):
-		self.response.write('<html><body>')
+		#self.response.write('<html><body>')
 		guestbook_name = self.request.get('guestbook_name',DEFAULT_GUESTBOOK_NAME)
 		greeting_query = Greeting.query(ancestor=guestbook_key(guestbook_name)).order(-Greeting.date)
 		greetings = greeting_query.fetch(10)
 		user= users.get_current_user();
-		for greeting in greetings:
-			if greeting.author:
-				author= greeting.author.email
-				if(user and user.user_id()) ==greeting.author.identity:
-					author+=' (You) '
-				self.response.write('<b>%s </b> wrote:' % author)
-			else:
-				self.response.write('An anonymous person wrote:')
-			self.response.write('<blockquote>%s</blockquote>' % cgi.escape(greeting.content))
+		# for greeting in greetings:
+		# 	if greeting.author:
+		# 		author= greeting.author.email
+		# 		if(user and user.user_id()) ==greeting.author.identity:
+		# 			author+=' (You) '
+		# 		self.response.write('<b>%s </b> wrote:' % author)
+		# 	else:
+		# 		self.response.write('An anonymous person wrote:')
+		# 	self.response.write('<blockquote>%s</blockquote>' % cgi.escape(greeting.content))
 		if user:
 			url = users.create_logout_url(self.request.uri)
 			url_linktext= 'Logout'
 		else:
 			url = users.create_login_url(self.request.uri)
 			url_linktext='Login'
-		sign_query_params = urllib.urlencode({'guestbook_name': guestbook_name})
-		self.response.write(MAIN_PAGE_FOOTER_TEMPLATE % (sign_query_params, cgi.escape(guestbook_name),url,url_linktext))
+		template_values = {
+			'user':user,
+			'greetings':greetings,
+			'guestbook_name': urllib.quote_plus(guestbook_name),
+			'url': url,
+			'url_linktext': url_linktext,
+		}
+
+		template = JINJA_EVIROMENT.get_template('index.html')
+		self.response.write(template.render(template_values))
+		# sign_query_params = urllib.urlencode({'guestbook_name': guestbook_name})
+		# self.response.write(MAIN_PAGE_FOOTER_TEMPLATE % (sign_query_params, cgi.escape(guestbook_name),url,url_linktext))
 
 class Guestbook(webapp2.RequestHandler):
 	def post(self):
