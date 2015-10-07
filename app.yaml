@@ -13,7 +13,7 @@ handlers:
   static_dir: stylesheets
 
 - url: /.*
-  script: guestbook.app
+  script: main.app
 
 
 libraries:
