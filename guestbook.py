@@ -3,6 +3,7 @@ import  os
 import urllib
 from google.appengine.api import users
 from google.appengine.ext import ndb
+from google.appengine.api import memcache
 import webapp2
 import jinja2
 
@@ -12,7 +13,6 @@ JINJA_EVIROMENT = jinja2.Environment(
 	extensions=['jinja2.ext.autoescape'],
 	autoescape=True
 )
-
 
 MAIN_PAGE_FOOTER_TEMPLATE= """\
 	<form action ="/sign?%s" method="post">
@@ -52,7 +52,9 @@ class MainPage(webapp2.RequestHandler):
 		#self.response.write('<html><body>')
 		guestbook_name = self.request.get('guestbook_name',DEFAULT_GUESTBOOK_NAME)
 		greeting_query = Greeting.query(ancestor=guestbook_key(guestbook_name)).order(-Greeting.date)
+
 		greetings = greeting_query.fetch(10)
+
 		user= users.get_current_user();
 		# for greeting in greetings:
 		# 	if greeting.author:
