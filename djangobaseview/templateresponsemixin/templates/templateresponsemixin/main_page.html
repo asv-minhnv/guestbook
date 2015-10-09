@@ -12,7 +12,7 @@
       <blockquote>{{ greeting.content|escape }}</blockquote>
     {% endfor %}
 
-    <form action="templateresponsemixin/sign/" method="post">
+    <form action="/templateresponsemixin/sign/" method="post">
       {% csrf_token %}
       <input type="hidden" name="guestbook_name" value="{{ greetings.guestbook_name }}" />
       <div><textarea name="content" rows="3" cols="60"></textarea></div>

@@ -1,4 +1,7 @@
+from cPickle import load
 import urllib
+from django.http import request
+
 from django.http.response import HttpResponseRedirect
 from django.views.generic import TemplateView, ListView
 from google.appengine.api import users
@@ -8,8 +11,6 @@ import logging
 from guestbook.models import Greeting, guestbook_key, DEFAULT_GUESTBOOK_NAME
 class IndexViev(ListView):
     guestbook_name = DEFAULT_GUESTBOOK_NAME
-  #   model = Greeting
-  # greetings_query = Greeting.query(ancestor=guestbook_key(guestbook_name)).order(-Greeting.date)
 
     greetings_query = Greeting.query(ancestor=guestbook_key(guestbook_name)).order(-Greeting.date)
     greetings = greetings_query.fetch(10)
@@ -29,7 +30,7 @@ class IndexViev(ListView):
     }
     queryset= template_values
     context_object_name= "greetings"
-    template_name= "guestbook/main_page.html"
+    template_name= "templateresponsemixin/main_page.html"
 
 class SignViev(TemplateView):
     def post(self,request):
