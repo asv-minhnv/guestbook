@@ -1,25 +1,24 @@
 <html>
-  <head>
-    <link type="text/css" rel="stylesheet" href="/static/css/main.css" />
-  </head>
-  <body>
-    {% for greeting in greetings.greetings %}
-      {% if greeting.author.nickname %}
-        <b>{{ greeting.author }}</b> wrote:
-      {% else %}
-        An anonymous person wrote:
-      {% endif %}
-      <blockquote>{{ greeting.content|escape }}</blockquote>
-    {% endfor %}
+<head>
+	<link type="text/css" rel="stylesheet" href="/static/css/main.css" />
+</head>
+<body>
+{% for greeting in greetings.greetings %}
+	{% if greeting.author.nickname %}
+		<b>{{ greeting.author }}</b> wrote:
+	{% else %}
+		An anonymous person wrote:
+	{% endif %}
+	<blockquote>{{ greeting.content|escape }}</blockquote>
+{% endfor %}
 
-    <form action="/templateresponsemixin/sign/" method="post">
-      {% csrf_token %}
-      <input type="hidden" name="guestbook_name" value="{{ greetings.guestbook_name }}" />
-      <div><textarea name="content" rows="3" cols="60"></textarea></div>
-      <div><input type="submit" value="Sign Guestbook"></div>
-    </form>
+<form action="/templateresponsemixin/sign/" method="post">
+	{% csrf_token %}
+	<input type="hidden" name="guestbook_name" value="{{ greetings.guestbook_name }}" />
+	<div><textarea name="content" rows="3" cols="60"></textarea></div>
+	<div><input type="submit" value="Sign Guestbook"></div>
+</form>
 
-    <a href="{{ greetings.url }}">{{ greetings.url_linktext }}</a>
-
-  </body>
+<a href="{{ greetings.url }}">{{ greetings.url_linktext }}</a>
+</body>
 </html>
