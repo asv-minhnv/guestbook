@@ -1,9 +1,8 @@
 import urllib
-import logging
-from django.http import request
+from google.appengine.api import users
 from django.http.response import HttpResponseRedirect
 from django.views.generic import TemplateView, ListView
-from google.appengine.api import users
+
 
 from guestbook.models import Greeting, guestbook_key, DEFAULT_GUESTBOOK_NAME
 
