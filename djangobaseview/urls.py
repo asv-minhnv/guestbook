@@ -6,5 +6,4 @@ from django.conf.urls import patterns, include, url
 
 urlpatterns = patterns('',
     url(r'^', include('guestbook.urls')),
-    url(r'^templateresponsemixin/', include('templateresponsemixin.urls')),
 )
