@@ -1,10 +1,14 @@
-from google.appengine.api import users
+import logging
+from google.appengine.api import users, mail, taskqueue
+from google.appengine.ext import webapp
 from django import forms
 from django.contrib import messages
 from django.views.generic.base import TemplateView
 from django.views.generic.edit import FormView
 
 from guestbook.models import Greeting, guestbook_key, DEFAULT_GUESTBOOK_NAME
+
+
 
 class MainView(TemplateView):
     template_name = 'guestbook/index.html'
@@ -30,6 +34,27 @@ class MainView(TemplateView):
         context['greetings'] = template_values
         return context
 
+def send_mail(request):
+    if request.method == 'POST':
+        user = users.get_current_user()
+        if user:
+            message= mail.EmailMessage()
+            message.sender=user.email()
+            message.to = user.email()
+            message.subject = 'Test'
+            message.body= """
+                            Dear Albert:
+
+                            Your example.com account has been approved.  You can now visit
+                            http://www.example.com/ and sign in using your Google Account to
+                            access new features.
+
+                            Please let us know if you have any questions.
+
+                            The example.com Team
+                            """
+            message.send()
+            logging.info(message)
 
 class SignForm(forms.Form):
     guestbook_name = forms.CharField(
@@ -60,6 +85,7 @@ class SignView(FormView):
             greeting.author = users.get_current_user()
         greeting.content = form.cleaned_data['guestkook_mesage']
         greeting.put()
+        taskqueue.add(url = '/guestbook/sendmail',)
         messages.warning(self.request, '%s created successfully.' % guestbook_name)
         return super(SignView, self).form_valid(form)
 
