@@ -1,12 +1,9 @@
-from time import timezone
 import urllib
 from google.appengine.api import users
-from django.http.response import HttpResponseRedirect, HttpResponse
-from django.views.generic import TemplateView, ListView
+from django.http.response import HttpResponseRedirect
+from django.views.generic import TemplateView
 
 from guestbook.models import Greeting, guestbook_key, DEFAULT_GUESTBOOK_NAME
-
-
 
 class IndexView(TemplateView):
 

@@ -1,4 +1,4 @@
-import os,sys
+import os
 os.environ['DJANGO_SETTINGS_MODULE'] = 'settings'
 
 # Google App Engine imports.
