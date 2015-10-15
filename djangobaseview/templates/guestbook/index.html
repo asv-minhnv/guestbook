@@ -1,30 +1,30 @@
 <html>
 <head>
-    <link type="text/css" rel="stylesheet" href="/static/css/main.css" />
+	<link type="text/css" rel="stylesheet" href="/static/css/main.css" />
 </head>
 <body>
 <table>
-    <tr>
-        <th width="50%">Guestbook name</th>
-        <th width="50%">Date Add</th>
-    </tr>
-    {% if guestbooks %}
-        {% for guestbook in guestbooks %}
-            <tr>
-                <td><a href="/guestbook/?guestbook_name={{ guestbook.name }}">{{ guestbook.name }}</a></td>
-                <td>{{ guestbook.date|date:"d-m-Y H:s" }}</td>
-            </tr>
-        {% endfor %}
-    {% else %}
-        <tr>
-            <td colspan="2">Don't have guestbook, add Greeting with <a href="/guestbook/">Guestbook default</a></td>
-        </tr>
-    {% endif %}
+	<tr>
+		<th width="50%">Guestbook name</th>
+		<th width="50%">Date Add</th>
+	</tr>
+	{% if guestbooks %}
+		{% for guestbook in guestbooks %}
+			<tr>
+				<td><a href="/guestbook/?guestbook_name={{ guestbook.name }}">{{ guestbook.name }}</a></td>
+				<td>{{ guestbook.date|date:"d-m-Y H:s" }}</td>
+			</tr>
+		{% endfor %}
+	{% else %}
+		<tr>
+			<td colspan="2">Don't have guestbook, add Greeting with <a href="/guestbook/">Guestbook default</a></td>
+		</tr>
+	{% endif %}
 </table>
 <form action="" method="post">
-    {% csrf_token %}
-    <div><input type="text" name="guestbook_name" value="{{ guestbook_name }}"/></div>
-    <div><input type="submit" value="Add Guestbook"></div>
+	{% csrf_token %}
+	<div><input type="text" name="guestbook_name" value="{{ guestbook_name }}"/></div>
+	<div><input type="submit" value="Add Guestbook"></div>
 </form>
 </body>
 </html>

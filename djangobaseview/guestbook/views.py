@@ -17,7 +17,6 @@ class IndexView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super(IndexView, self).get_context_data(**kwargs)
         context['guestbooks'] = Guestbook.get_list()
-        logging.info(context)
         return  context
 
 
@@ -34,12 +33,11 @@ class GuestbookView(TemplateView):
         guestbook_name = self.request.GET.get('guestbook_name',DEFAULT_GUESTBOOK_NAME)
         greetings = Greeting.get_latest(guestbook_name,10)
         if users.get_current_user():
-            url = users.create_logout_url(self.request.get_full_path())
+            url = users.create_logout_url('')
             url_linktext = 'Logout'
         else:
-            url = users.create_login_url(self.request.get_full_path())
+            url = users.create_login_url('')
             url_linktext = 'Login'
-
         template_values = {
             'greetings': greetings,
             'guestbook_name': guestbook_name,
