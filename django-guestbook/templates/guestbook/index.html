@@ -12,7 +12,7 @@
 	{% for greeting in greetings.greetings %}
 		<tr>
 			<td>{% if greeting.author.nickname %}
-				<b>{{ greeting.author }}</b>
+				<b>{{ greeting.key.id}} r {{ greeting.author }}</b>
 			{% else %}
 				An anonymous person
 			{% endif %}</td>
