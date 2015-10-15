@@ -62,9 +62,3 @@ class Guestbook(ndb.Model):
 			guestbook.put()
 
 
-			# @staticmethod
-			# def check_guestbook(guestbook_name):
-
-
-
-
