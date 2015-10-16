@@ -1,8 +1,9 @@
 import urllib
 from google.appengine.api import users
+from google.appengine.api import memcache
 from django.http.response import HttpResponseRedirect
 from django.views.generic import TemplateView
-from guestbook.models import Greeting
+from guestbook.models import Greeting, Guestbook
 
 
 class IndexView(TemplateView):
@@ -16,7 +17,7 @@ class IndexView(TemplateView):
 
 	def get_context_data(self, **kwargs):
 		context = super(IndexView, self).get_context_data(**kwargs)
-		guestbook_name = self.request.GET.get('guestbook_name',Greeting.get_default_guestbook())
+		guestbook_name = self.request.GET.get('guestbook_name',Guestbook.get_default_guestbook())
 		greetings = Greeting.get_latest(guestbook_name,10)
 		if users.get_current_user():
 			url = users.create_logout_url(self.request.get_full_path())
