@@ -7,18 +7,25 @@
 	<table>
 		<tr>
 			<th width="20%">User </th>
-			<th width="50%">Content</th>
+			<th width="30%">Content</th>
 			<th width="30%">Date add</th>
+			<th width="20%"></th>
 		</tr>
 		{% for greeting in greetings %}
 			<tr>
-				<td>{% if greeting.author.nickname %}
+				<td><a href="/detail/?guestbook_name={{ guestbook_name }}&id={{ greeting.key.id }}">
+					{% if greeting.author.nickname %}
 					<b>{{ greeting.author }}</b>
 				{% else %}
 					An anonymous person
-				{% endif %}</td>
+				{% endif %}</a></td>
 				<td>{{ greeting.content|escape }}</td>
 				<td>{{ greeting.date|date:"d-m-Y H:s" }}</td>
+				<td>
+					<a href="/edit/?guestbook_name={{ guestbook_name }}&id={{ greeting.key.id }}"><button type="button">Edit</button></a>
+					<a href="/delete/?guestbook_name={{ guestbook_name }}&id={{ greeting.key.id }}"><button type="button">Delete</button></a>
+				</td>
+
 			</tr>
 		{% endfor %}
 	</table>
