@@ -1,4 +1,3 @@
-import logging
 from google.appengine.api import users
 from google.appengine.ext import ndb
 
@@ -9,9 +8,6 @@ DEFAULT_GUESTBOOK_NAME = 'default_guestbook'
 # entity group. Queries across the single entity group will be consistent.
 # However, the write rate should be limited to ~1/second.
 
-def guestbook_key(guestbook_name=DEFAULT_GUESTBOOK_NAME):
-	'''Constructs a Datastore key for a Guestbook entity with guestbook_name.'''
-	return ndb.Key('Guestbook', guestbook_name)
 
 
 class Greeting(ndb.Model):
@@ -20,45 +16,26 @@ class Greeting(ndb.Model):
 	content = ndb.StringProperty(indexed=False)
 	date = ndb.DateTimeProperty(auto_now_add=True)
 
-	@staticmethod
-	def get_latest(guestbook_name, count):
-		greetings_query = Greeting.query(ancestor=guestbook_key(guestbook_name)).order(-Greeting.date)
+	@classmethod
+	def get_default_guestbook(cls):
+		return 'default_guestbook'
+
+	@classmethod
+	def get_key_guesbook(cls, guestbook_name):
+		if not guestbook_name:
+			guestbook_name = cls.get_default_guestbook()
+		return ndb.Key('Guestbook', guestbook_name)
+
+	@classmethod
+	def get_latest(cls, guestbook_name, count):
+		greetings_query = cls.query(ancestor=cls.get_key_guesbook(guestbook_name)).order(-cls.date)
 		greetings = greetings_query.fetch(count)
 		return greetings
 
-	@staticmethod
-	def save_greeting(request,guestbook_name):
-		greeting = Greeting(parent=guestbook_key(guestbook_name))
+	@classmethod
+	def add_greeting(cls, content, guestbook_name):
+		greeting = cls(parent=cls.get_key_guesbook(guestbook_name))
 		if users.get_current_user():
 			greeting.author = users.get_current_user()
-		greeting.content = request.POST.get('content')
+		greeting.content = content
 		greeting.put()
-		Guestbook.save_guestbook(guestbook_name)
-
-
-class Guestbook(ndb.Model):
-	name = ndb.StringProperty()
-	date = ndb.DateTimeProperty(auto_now_add=True)
-
-	@staticmethod
-	def get_list():
-		guestbook = Guestbook()
-		guestbook_query = guestbook.query(ancestor=guestbook_key()).order(-Guestbook.date)
-		guestbook._result_cache = None
-		guestbooks = guestbook_query.fetch()
-		return guestbooks
-
-	@staticmethod
-	def get_guestbook_by_name(guestbook_name):
-		guestbook = Guestbook.query(Guestbook.name==guestbook_name).get()
-		return guestbook
-
-	@staticmethod
-	def save_guestbook(guestbook_name):
-		check_guestbook = Guestbook.get_guestbook_by_name(guestbook_name)
-		if check_guestbook is None:
-			guestbook = Guestbook(parent=guestbook_key())
-			guestbook.name= guestbook_name
-			guestbook.put()
-
-
