@@ -1,11 +1,15 @@
+import logging
 import urllib
+from google.appengine.api import mail
 from google.appengine.api import users
+from google.appengine.api import taskqueue
 from django.contrib import messages
 from django import forms
 from django.http.response import HttpResponseRedirect
 from django.views.generic import TemplateView
 from django.views.generic.edit import FormView
 from guestbook.models import Greeting, Guestbook
+
 
 
 class IndexView(TemplateView):
@@ -64,8 +68,58 @@ class SignView(FormView):
 		content = form.cleaned_data['guestbook_mesage']
 		Greeting.add_greeting(content, guestbook_name)
 		messages.success(self.request, '%s created successfully.' % guestbook_name)
+		user = users.get_current_user()
+		if user:
+			taskqueue.add(url = '/sign',params = {'email': user.email()},method = 'GET')
 		return super(SignView, self).form_valid(form)
 
 	def form_invalid(self, form):
 		messages.warning(self.request, 'Please input field!')
 		return super(SignView, self).form_invalid(form)
+
+
+def send_mail(request):
+	logging.info('begin')
+	if request.method == 'GET':
+		logging.info('begin 12')
+		user = users.get_current_user()
+		if user:
+			message= mail.EmailMessage()
+			message.sender=user.email()
+			message.to = user.email()
+			message.subject = 'Test'
+			message.body= """
+							Dear Albert:
+							Your example.com account has been approved.  You can now visit
+							http://www.example.com/ and sign in using your Google Account to
+							access new features.
+							Please let us know if you have any questions.
+							The example.com Team
+							"""
+			message.send()
+			logging.info(message)
+			return
+	return HttpResponseRedirect('/')
+
+# class SendmailView(TemplateView):
+# 	logging.info('begin')
+# 	# def get(self, request, *args, **kwargs):
+# 		logging.info('begin 1')
+# 		email = request.GET.get('email')
+# 		if email:
+# 			# message= mail.EmailMessage()
+# 			# message.sender = email
+# 			# message.to = email
+# 			# message.subject = 'Test'
+# 			# message.body= """
+# 			# 				Dear Albert:
+# 			# 				Your example.com account has been approved.  You can now visit
+# 			# 				http://www.example.com/ and sign in using your Google Account to
+# 			# 				access new features.
+# 			# 				Please let us know if you have any questions.
+# 			# 				The example.com Team
+# 			# 				"""
+# 			# message.send()
+# 			logging.info(message)
+# 			return HttpResponseRedirect('/sign')
+# 		return HttpResponseRedirect('/')
