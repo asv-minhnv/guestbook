@@ -23,7 +23,12 @@
 		{% endfor %}
 	</table>
 {%  endif %}
-<a class="link" href="/sign">Sign Guestbook</a>
+<h2 class="link">Switch Guestbook </h2>
+<form action="" method="get">
+	<div><input type="text" name="guestbook_name" value="{{ guestbook_name }}"/> <input type="submit" value="Switch Guestbookk"></div>
+-</form>
+
+<a class="link" href="/sign?guestbook_name={{ guestbook_name }}">Sign Guestbook</a>
 <a class="link" href="{{ url }}">{{ url_linktext }}</a>
 </body>
 </html>
