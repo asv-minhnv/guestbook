@@ -45,7 +45,6 @@ form  p > label{
 }
 form  p > input{
     float: left;
-    margin-left: 20px;
 }
 .errorlist{
     float: left;

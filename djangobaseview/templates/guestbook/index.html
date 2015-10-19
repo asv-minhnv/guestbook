@@ -23,16 +23,7 @@
 		{% endfor %}
 	</table>
 {%  endif %}
-<h2 class="link">Sign Guestbook </h2>
-<form action="" method="get">
-	<div><input type="text" name="guestbook_name" value="{{ guestbook_name }}"/> <input type="submit" value="Switch Guestbookk"></div>
-</form>
-<form action="" method="post">
-	{% csrf_token %}
-	<div><textarea name="content" rows="3" cols="60"></textarea></div>
-	<div><input type="hidden" name="guestbook_name" value="{{ guestbook_name }}"/></div>
-	<div><input type="submit" value="Sign Guestbook"></div>
-</form>
+<a class="link" href="/sign">Sign Guestbook</a>
 <a class="link" href="{{ url }}">{{ url_linktext }}</a>
 </body>
 </html>

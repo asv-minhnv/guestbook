@@ -1,8 +1,10 @@
 import urllib
 from google.appengine.api import users
-from google.appengine.api import memcache
+from django.contrib import messages
+from django import forms
 from django.http.response import HttpResponseRedirect
 from django.views.generic import TemplateView
+from django.views.generic.edit import FormView
 from guestbook.models import Greeting, Guestbook
 
 
@@ -33,3 +35,37 @@ class IndexView(TemplateView):
 		}
 		template_values.update(context)
 		return template_values
+
+
+class SignForm(forms.Form):
+	guestbook_name = forms.CharField(
+		label='Guestbook name',
+		max_length=50
+	)
+	guestbook_mesage = forms.CharField(
+		widget=forms.Textarea,
+		label='Guestkook mesage',
+		max_length=100
+	)
+
+
+class SignView(FormView):
+	template_name = 'guestbook/sign.html'
+	form_class = SignForm
+	success_url = '/sign/'
+	def get_initial(self):
+		initial = super(SignView, self).get_initial()
+		guestbook_name = self.request.GET.get('guestbook_name',Guestbook.get_default_guestbook())
+		initial['guestbook_name'] = guestbook_name
+		return  initial
+
+	def form_valid(self, form):
+		guestbook_name = form.cleaned_data['guestbook_name']
+		content = form.cleaned_data['guestbook_mesage']
+		Greeting.add_greeting(content, guestbook_name)
+		messages.success(self.request, '%s created successfully.' % guestbook_name)
+		return super(SignView, self).form_valid(form)
+
+	def form_invalid(self, form):
+		messages.warning(self.request, 'Please input field!')
+		return super(SignView, self).form_invalid(form)
