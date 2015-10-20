@@ -77,7 +77,7 @@ class SignView(FormView):
 		messages.warning(self.request, 'Please input field!')
 		return super(SignView, self).form_invalid(form)
 
-
+		
 class SendmailView(TemplateView):
 	def get(self, request, *args, **kwargs):
 		email = request.GET.get('email')
