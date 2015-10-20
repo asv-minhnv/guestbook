@@ -98,7 +98,7 @@ def send_mail(request):
 							"""
 			message.send()
 			logging.info(message)
-			return
+			return HttpResponseRedirect('/')
 	return HttpResponseRedirect('/')
 
 # class SendmailView(TemplateView):
