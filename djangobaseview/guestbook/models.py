@@ -37,6 +37,14 @@ class Greeting(ndb.Model):
 		memcache.flush_all()
 
 	@classmethod
+	def update_greeting(cls, content, guestbook_name, greeting_id):
+		greeting_key = cls.get_key_by_id(guestbook_name,greeting_id)
+		greeting = cls.query(ancestor = greeting_key).order(-cls.date).get()
+		greeting.content = content
+		greeting.put()
+		memcache.flush_all()
+
+	@classmethod
 	def get_key_by_id(cls, guestbook_name, greeting_id):
 		try:
 			greeting_id = int(greeting_id)
