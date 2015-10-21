@@ -25,7 +25,8 @@ class IndexView(TemplateView):
 		context = super(IndexView, self).get_context_data(**kwargs)
 		guestbook_name = self.request.GET.get('guestbook_name',Guestbook.get_default_guestbook())
 		greetings = Greeting.get_latest(guestbook_name,10)
-		if users.get_current_user():
+		user = users.get_current_user()
+		if user:
 			url = users.create_logout_url(self.request.get_full_path())
 			url_linktext = 'Logout'
 		else:
@@ -34,6 +35,7 @@ class IndexView(TemplateView):
 		template_values = {
 			'greetings': greetings,
 			'guestbook_name': guestbook_name,
+			'isadmin': users.is_current_user_admin(),
 			'url': url,
 			'url_linktext': url_linktext,
 		}
@@ -98,7 +100,6 @@ class DeleteView(FormView):
 		initial = super(DeleteView, self).get_initial()
 		guestbook_name = self.request.GET.get('guestbook_name', Guestbook.get_default_guestbook())
 		greeting_id = self.request.GET.get('id')
-		# greeting = Greeting.get_greeting(guestbook_name, greeting_id)
 		initial['guestbook_name'] = guestbook_name
 		initial['greeting_id'] = greeting_id
 		return initial
@@ -108,7 +109,8 @@ class DeleteView(FormView):
 		greeting_id = form.cleaned_data['greeting_id']
 		Greeting.delete_greeting(guestbook_name, greeting_id)
 		messages.success(self.request, 'Delete successfully greeting.')
-		return HttpResponseRedirect('/?' + urllib.urlencode({'guestbook_name': guestbook_name}))
+		return super(DeleteView, self).form_valid(form)
+		# return HttpResponseRedirect('/?' + urllib.urlencode({'guestbook_name': guestbook_name}))
 
 	def form_invalid(self, form):
 		messages.warning(self.request, 'Can not delete Greeting')

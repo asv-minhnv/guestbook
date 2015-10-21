@@ -37,18 +37,21 @@ class Greeting(ndb.Model):
 		memcache.flush_all()
 
 	@classmethod
+	def update_greeting(cls, content, guestbook_name, greeting_id):
+		greeting_key = cls.get_key_by_id(guestbook_name,greeting_id)
+		greeting = cls.query(ancestor = greeting_key).order(-cls.date).get()
+		greeting.content = content
+		greeting.put()
+		memcache.flush_all()
+
+	@classmethod
 	def get_key_by_id(cls, guestbook_name, greeting_id):
 		try:
 			greeting_id = int(greeting_id)
 		except ValueError:
 			raise ValueError("Greeting ID must be a positive integer. Please try again!")
 
-		return ndb.Key("Guestbook", str(guestbook_name), "Greeting", greeting_id)
-
-	@classmethod
-	def get_greeting(cls, guestbook_name, greeting_id):
-		greeting_key = cls.get_key_by_id(guestbook_name,greeting_id)
-		return cls.query(ancestor = greeting_key).order(-cls.date).get()
+		return ndb.Key(cls, greeting_id, parent=Guestbook.get_key_guestbook(guestbook_name))
 
 	@classmethod
 	def delete_greeting(cls, guestbook_name, greeting_id):
