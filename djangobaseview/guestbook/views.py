@@ -1,11 +1,15 @@
+import logging
 import urllib
+from google.appengine.api import mail
 from google.appengine.api import users
+from google.appengine.api import taskqueue
 from django.contrib import messages
 from django import forms
-from django.http.response import HttpResponseRedirect
+from django.http.response import HttpResponse
 from django.views.generic import TemplateView
 from django.views.generic.edit import FormView
 from guestbook.models import Greeting, Guestbook
+
 
 
 class IndexView(TemplateView):
@@ -64,8 +68,28 @@ class SignView(FormView):
 		content = form.cleaned_data['guestbook_mesage']
 		Greeting.add_greeting(content, guestbook_name)
 		messages.success(self.request, '%s created successfully.' % guestbook_name)
+		user = users.get_current_user()
+		if user:
+			taskqueue.add(url = '/sendmail/',params = {'email': user.email()},method = 'GET')
 		return super(SignView, self).form_valid(form)
 
 	def form_invalid(self, form):
 		messages.warning(self.request, 'Please input field!')
 		return super(SignView, self).form_invalid(form)
+
+
+class SendmailView(TemplateView):
+	def get(self, request, *args, **kwargs):
+		email = request.GET.get('email')
+		if email:
+			message= mail.EmailMessage()
+			message.sender = email
+			message.to = email
+			message.subject = 'Test'
+			message.body= """
+							Wellcom
+							You creat Greeting
+							"""
+			message.send()
+			return HttpResponse(status=204)
+		return HttpResponse(status=400)
