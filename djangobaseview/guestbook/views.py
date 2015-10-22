@@ -36,6 +36,7 @@ class IndexView(TemplateView):
 			'greetings': greetings,
 			'guestbook_name': guestbook_name,
 			'is_admin': users.is_current_user_admin(),
+			'user_info': users.get_current_user(),
 			'url': url,
 			'url_linktext': url_linktext,
 		}
@@ -153,13 +154,17 @@ class EditView(FormView):
 		initial['guestbook_mesage'] = greeting.content
 		return initial
 
+	def get_success_url(self):
+		guestbook_name = self.request.GET.get('guestbook_name', Guestbook.get_default_guestbook())
+		return '/?' + urllib.urlencode({'guestbook_name': guestbook_name})
+
 	def form_valid(self, form):
 		guestbook_name = form.cleaned_data['guestbook_name']
 		greeting_id = form.cleaned_data['greeting_id']
 		content = form.cleaned_data['guestbook_mesage']
 		Greeting.update_greeting(content, guestbook_name, greeting_id)
 		messages.success(self.request, 'Edit successfully greeting.')
-		return HttpResponseRedirect('/?' + urllib.urlencode({'guestbook_name': guestbook_name}))
+		return super(EditView, self).form_valid(form)
 
 	def form_invalid(self, form):
 		messages.warning(self.request, 'Can not edit Greeting')
