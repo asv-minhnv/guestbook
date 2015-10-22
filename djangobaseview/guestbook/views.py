@@ -5,7 +5,7 @@ from google.appengine.api import users
 from google.appengine.api import taskqueue
 from django.contrib import messages
 from django import forms
-from django.http.response import HttpResponseRedirect
+from django.http.response import HttpResponse
 from django.views.generic import TemplateView
 from django.views.generic.edit import FormView
 from guestbook.models import Greeting, Guestbook
@@ -116,7 +116,7 @@ class DeleteView(FormView):
 		messages.warning(self.request, 'Can not delete Greeting')
 		return super(DeleteView, self).form_invalid(form)
 
-
+		
 class SendmailView(TemplateView):
 	def get(self, request, *args, **kwargs):
 		email = request.GET.get('email')
@@ -130,6 +130,5 @@ class SendmailView(TemplateView):
 							You creat Greeting
 							"""
 			message.send()
-			# logging.info(message)
-			return HttpResponseRedirect('/sign')
-		return HttpResponseRedirect('/')
+			return HttpResponse(status=204)
+		return HttpResponse(status=400)
