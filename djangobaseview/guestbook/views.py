@@ -36,6 +36,7 @@ class IndexView(TemplateView):
 			'greetings': greetings,
 			'guestbook_name': guestbook_name,
 			'is_admin': users.is_current_user_admin(),
+			'user_info': users.get_current_user(),
 			'url': url,
 			'url_linktext': url_linktext,
 		}
@@ -96,6 +97,7 @@ class DeleteView(FormView):
 	template_name = "guestbook/delete.html"
 	form_class = DeleteForm
 	success_url = '/'
+
 	def get_initial(self):
 		initial = super(DeleteView, self).get_initial()
 		guestbook_name = self.request.GET.get('guestbook_name', Guestbook.get_default_guestbook())
@@ -103,7 +105,7 @@ class DeleteView(FormView):
 		initial['guestbook_name'] = guestbook_name
 		initial['greeting_id'] = greeting_id
 		return initial
-
+		
 	def get_success_url(self):
 		guestbook_name = self.request.GET.get('guestbook_name', Guestbook.get_default_guestbook())
 		return '/?' + urllib.urlencode({'guestbook_name': guestbook_name})
@@ -118,6 +120,55 @@ class DeleteView(FormView):
 	def form_invalid(self, form):
 		messages.warning(self.request, 'Can not delete Greeting')
 		return super(DeleteView, self).form_invalid(form)
+
+		
+class EditForm(forms.Form):
+	guestbook_name = forms.CharField(
+		widget=forms.HiddenInput(),
+		label='Guestbook name',
+		max_length=50
+	)
+	greeting_id = forms.IntegerField(
+		widget=forms.HiddenInput(),
+		label='Greeeting id ',
+	)
+	guestbook_mesage = forms.CharField(
+		widget=forms.Textarea,
+		label='Guestkook mesage',
+		max_length=100
+	)
+
+
+class EditView(FormView):
+	template_name = "guestbook/edit.html"
+	form_class = EditForm
+	success_url = '/'
+
+	def get_initial(self):
+		initial = super(EditView, self).get_initial()
+		guestbook_name = self.request.GET.get('guestbook_name', Guestbook.get_default_guestbook())
+		greeting_id = self.request.GET.get('id')
+		greeting = Greeting.get_greeting(guestbook_name, greeting_id)
+		initial['guestbook_name'] = guestbook_name
+		initial['greeting_id'] = greeting_id
+		initial['guestbook_mesage'] = greeting.content
+		return initial
+
+	def get_success_url(self):
+		guestbook_name = self.request.GET.get('guestbook_name', Guestbook.get_default_guestbook())
+		return '/?' + urllib.urlencode({'guestbook_name': guestbook_name})
+
+	def form_valid(self, form):
+		guestbook_name = form.cleaned_data['guestbook_name']
+		greeting_id = form.cleaned_data['greeting_id']
+		content = form.cleaned_data['guestbook_mesage']
+		Greeting.update_greeting(content, guestbook_name, greeting_id)
+		messages.success(self.request, 'Edit successfully greeting.')
+		return super(EditView, self).form_valid(form)
+
+	def form_invalid(self, form):
+		messages.warning(self.request, 'Can not edit Greeting')
+		return super(EditView, self).form_invalid(form)
 
 		
 class SendmailView(TemplateView):
