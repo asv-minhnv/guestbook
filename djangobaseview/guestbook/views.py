@@ -25,7 +25,8 @@ class IndexView(TemplateView):
 		context = super(IndexView, self).get_context_data(**kwargs)
 		guestbook_name = self.request.GET.get('guestbook_name',Guestbook.get_default_guestbook())
 		greetings = Greeting.get_latest(guestbook_name,10)
-		if users.get_current_user():
+		user = users.get_current_user()
+		if user:
 			url = users.create_logout_url(self.request.get_full_path())
 			url_linktext = 'Logout'
 		else:
@@ -34,6 +35,7 @@ class IndexView(TemplateView):
 		template_values = {
 			'greetings': greetings,
 			'guestbook_name': guestbook_name,
+			'is_admin': users.is_current_user_admin(),
 			'url': url,
 			'url_linktext': url_linktext,
 		}
@@ -78,6 +80,46 @@ class SignView(FormView):
 		return super(SignView, self).form_invalid(form)
 
 
+class DeleteForm(forms.Form):
+	guestbook_name = forms.CharField(
+		widget=forms.HiddenInput(),
+		label='Guestbook name',
+		max_length=50
+	)
+	greeting_id = forms.IntegerField(
+		widget=forms.HiddenInput(),
+		label='Greeeting id ',
+	)
+
+
+class DeleteView(FormView):
+	template_name = "guestbook/delete.html"
+	form_class = DeleteForm
+	success_url = '/'
+	def get_initial(self):
+		initial = super(DeleteView, self).get_initial()
+		guestbook_name = self.request.GET.get('guestbook_name', Guestbook.get_default_guestbook())
+		greeting_id = self.request.GET.get('id')
+		initial['guestbook_name'] = guestbook_name
+		initial['greeting_id'] = greeting_id
+		return initial
+
+	def get_success_url(self):
+		guestbook_name = self.request.GET.get('guestbook_name', Guestbook.get_default_guestbook())
+		return '/?' + urllib.urlencode({'guestbook_name': guestbook_name})
+
+	def form_valid(self, form):
+		guestbook_name = form.cleaned_data['guestbook_name']
+		greeting_id = form.cleaned_data['greeting_id']
+		Greeting.delete_greeting(guestbook_name, greeting_id)
+		messages.success(self.request, 'Delete successfully greeting.')
+		return super(DeleteView, self).form_valid(form)
+
+	def form_invalid(self, form):
+		messages.warning(self.request, 'Can not delete Greeting')
+		return super(DeleteView, self).form_invalid(form)
+
+		
 class SendmailView(TemplateView):
 	def get(self, request, *args, **kwargs):
 		email = request.GET.get('email')
