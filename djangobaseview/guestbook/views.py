@@ -35,7 +35,7 @@ class IndexView(TemplateView):
 		template_values = {
 			'greetings': greetings,
 			'guestbook_name': guestbook_name,
-			'isadmin': users.is_current_user_admin(),
+			'is_admin': users.is_current_user_admin(),
 			'url': url,
 			'url_linktext': url_linktext,
 		}
@@ -104,13 +104,16 @@ class DeleteView(FormView):
 		initial['greeting_id'] = greeting_id
 		return initial
 
+	def get_success_url(self):
+		guestbook_name = self.request.GET.get('guestbook_name', Guestbook.get_default_guestbook())
+		return '/?' + urllib.urlencode({'guestbook_name': guestbook_name})
+
 	def form_valid(self, form):
 		guestbook_name = form.cleaned_data['guestbook_name']
 		greeting_id = form.cleaned_data['greeting_id']
 		Greeting.delete_greeting(guestbook_name, greeting_id)
 		messages.success(self.request, 'Delete successfully greeting.')
 		return super(DeleteView, self).form_valid(form)
-		# return HttpResponseRedirect('/?' + urllib.urlencode({'guestbook_name': guestbook_name}))
 
 	def form_invalid(self, form):
 		messages.warning(self.request, 'Can not delete Greeting')

@@ -28,7 +28,7 @@
 				<td>{{ greeting.content|escape }}</td>
 				<td>{{ greeting.date|date:"d-m-Y H:s" }}</td>
 				<td>
-					{% if isadmin  %}
+					{% if is_admin  %}
 						<a href="/delete/?guestbook_name={{ guestbook_name }}&id={{ greeting.key.id }}"><button type="button">Delete</button></a>
 					{% endif %}
 				</td>
