@@ -5,12 +5,12 @@
 <body>
 {% if greetings %}
 	{% if messages %}
-	<ul class="messages">
-		{% for message in messages %}
-			<li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
-		{% endfor %}
-	</ul>
-{% endif %}
+		<ul class="messages">
+			{% for message in messages %}
+				<li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+			{% endfor %}
+		</ul>
+	{% endif %}
 	<table>
 		<tr>
 			<th width="20%">User </th>
@@ -29,7 +29,9 @@
 				<td>{{ greeting.date|date:"d-m-Y H:s" }}</td>
 				<td>
 					<a href="/edit/?guestbook_name={{ guestbook_name }}&id={{ greeting.key.id }}"><button type="button">Edit</button></a>
-					<a href="/delete/?guestbook_name={{ guestbook_name }}&id={{ greeting.key.id }}"><button type="button">Delete</button></a>
+					{% if is_admin  %}
+						<a href="/delete/?guestbook_name={{ guestbook_name }}&id={{ greeting.key.id }}"><button type="button">Delete</button></a>
+					{% endif %}
 				</td>
 			</tr>
 		{% endfor %}
