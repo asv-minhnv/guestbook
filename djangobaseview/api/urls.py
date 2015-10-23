@@ -1,6 +1,8 @@
 from django.conf.urls import patterns,url
-from guestbook.views import IndexView, SignView, DeleteView, SendmailView, EditView
-
+# from api.views import IndexView
+from api.apis import GetListView,ResourceSinge
 urlpatterns = patterns('',
-	url(r'^guestbook/?P<guestbook_name>/greeting$', IndexView.as_view()),
+	url(r'^guestbook/(?P<guestbook_name>.+)/greeting/(?P<id>\d+)$', ResourceSinge.as_view()),
+	url(r'^guestbook/(?P<guestbook_name>).+/greeting/$', GetListView.as_view()),
+
 )

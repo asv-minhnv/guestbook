@@ -1,6 +1,8 @@
+import datetime
 from google.appengine.api import users
 from google.appengine.ext import ndb
 from google.appengine.api import memcache
+from google.appengine.ext.ndb import Cursor
 
 DEFAULT_GUESTBOOK_NAME = 'default_guestbook'
 
@@ -16,6 +18,8 @@ class Greeting(ndb.Model):
 	author = ndb.UserProperty()
 	content = ndb.StringProperty(indexed=False)
 	date = ndb.DateTimeProperty(auto_now_add=True)
+	update_date = ndb.DateTimeProperty(auto_now_add=True)
+
 
 	@classmethod
 	def get_latest(cls, guestbook_name, count):
@@ -33,16 +37,19 @@ class Greeting(ndb.Model):
 		if users.get_current_user():
 			greeting.author = users.get_current_user()
 		greeting.content = content
-		greeting.put()
+		new_greeting = greeting.put()
 		memcache.flush_all()
+		return new_greeting
 
 	@classmethod
 	def update_greeting(cls, content, guestbook_name, greeting_id):
 		greeting_key = cls.get_key_by_id(guestbook_name,greeting_id)
 		greeting = greeting_key.get()
 		greeting.content = content
-		greeting.put()
+		greeting.update_date = datetime.datetime.now()
+		update_greeting = greeting.put()
 		memcache.flush_all()
+		return update_greeting
 
 	@classmethod
 	def get_greeting(cls, guestbook_name, greeting_id):
@@ -62,8 +69,25 @@ class Greeting(ndb.Model):
 	@classmethod
 	def delete_greeting(cls, guestbook_name, greeting_id):
 		greeting_key = cls.get_key_by_id(guestbook_name,greeting_id)
-		greeting_key.delete()
+		delete_greeting = greeting_key.delete()
 		memcache.flush_all()
+		return delete_greeting
+
+	@classmethod
+	def get_greeting_with_cursor(cls, url_safe, guestbook_name, count=20):
+		start_cursor = Cursor(urlsafe=url_safe)
+		greetings, next_cursor, is_more = cls.query(ancestor=Guestbook.get_key_guestbook(guestbook_name)).order(-cls.date).fetch_page(count, start_cursor=start_cursor)
+
+		greeting_json = [
+			{
+				"greeting_id": greeting.key.id(),
+				"greeting_auth": str(greeting.author),
+				"greeting_content": str(greeting.content),
+				"greeting_date": str(greeting.date)
+			} for greeting in greetings
+		]
+
+		return greeting_json, next_cursor, is_more
 
 
 class Guestbook(ndb.Model):
