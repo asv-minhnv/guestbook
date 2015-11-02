@@ -2,7 +2,6 @@ import json
 import logging
 from django import forms
 from django.http import HttpResponse, QueryDict
-from  google.appengine.api import users
 from django.views.generic.edit import FormView
 
 from guestbook.models import Greeting, Guestbook
@@ -104,71 +103,9 @@ class ResourceSinge(JSONResponseMixin, FormView):
 			self.request.POST = QueryDict(self.request.body)
 		else:
 			self.request.POST = json_object
-		logging.info(self.request.POST)
 		form_class = self.get_form_class()
 		form = self.get_form(form_class)
-		logging.info(self.request.POST)
-
-
-		# form = self.get_form(form_class)
-		# logging.info(form)
-		# if not form.is_valid():
-		return HttpResponse(status=400)
-
-		# update_greeting = self.update_resources(form, **kwargs)
-		# if update_greeting:
-		# 	return HttpResponse(status=204)
-		# else:
-		# 	return HttpResponse(status=404)
-
-	# def put(self, *args, **kwargs):
-	#
-	# 	self.request.POST = QueryDict(self.request.body)
-	# 	form_class = self.get_form_class()
-	# 	form = self.get_form(form_class)
-	#
-	# 	# if not form.is_valid():
-	# 	# 	return HttpResponse(status=400)
-	# 	logging.info(form)
-	# 	# if self.request.method in ('POST', 'PUT'):
-	# 	# 	kwargs.update({
-	# 	# 		'data': self.request.POST,
-	# 	# 		'files': self.request.FILES,
-	# 	# 	})
-	# 	# logging.info(kwargs)
-	# 	# logging.info(kwargs)
-	# 	# logging.info(form)
-	# 	# if not form.is_valid():
-	# 	# 	return HttpResponse(status=404)
-	# 	# guestbook_name = kwargs.get('guestbook_name',Guestbook.get_default_guestbook())
-	# 	# # content = form.cleaned_data['guestbook_mesage']
-	# 	# greeting_id = kwargs.get('id', None)
-	# 	# update_greeting = Greeting.update_greeting(content, guestbook_name, greeting_id)
-	# 	# if update_greeting:
-	# 	# 	return HttpResponse(status=204)
-	# 	# else:
-	# 	return HttpResponse(status=404)
-
-	def post(self, request, *args, **kwargs):
-		try:
-			json_object = json.loads(self.request.body)
-		except ValueError:
-			self.request.POST = QueryDict(self.request.body)
-		else:
-			self.request.POST = json_object
-
-		logging.info(self.request.POST)
-		form_class = self.get_form_class()
-		form = self.get_form(form_class)
-		logging.info(self.request.POST)
-
-		# logging.info(kwargs)
-		if not form.is_valid():
-			return HttpResponse(status=404)
-		guestbook_name = kwargs.get('guestbook_name',Guestbook.get_default_guestbook())
-		content = form.cleaned_data['guestbook_mesage']
-		greeting_id = kwargs.get('id', None)
-		update_greeting = Greeting.update_greeting(content, guestbook_name, greeting_id)
+		update_greeting = self.update_resources(form, **kwargs)
 		if update_greeting:
 			return HttpResponse(status=204)
 		else:
