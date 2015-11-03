@@ -1,10 +1,28 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-	<meta charset="UTF-8">
-	<title></title>
+	<meta charset="utf-8">
+	<title>Tutorial: Hello Dojo!</title>
+	<link rel="stylesheet" type="text/css" href="//ajax.googleapis.com/ajax/libs/dojo/1.10.0/dijit/themes/soria/soria.css" />
 </head>
 <body>
-
+<div id="result" style="padding: 20px; width: 650px">
+</div>
+<!-- configure Dojo -->
+<script type="text/javascript">
+	{% autoescape off %}
+		var dojoConfig = {
+			locale: 'ja',
+			baseUrl: '//ajax.googleapis.com/ajax/libs/dojo/1.10.4/dojo',
+			paths: {
+				'guestbook': '/static/js/guestbook'
+			}
+		};
+	{% endautoescape %}
+</script>
+<script src="//ajax.googleapis.com/ajax/libs/dojo/1.10.4/dojo/dojo.js"></script>
+<script type="text/javascript">
+	require(['guestbook/app']);
+</script>
 </body>
 </html>

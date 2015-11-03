@@ -2,107 +2,94 @@ define([
 	"dojo/_base/declare",
 	"dojo/_base/fx",
 	"dojo/_base/lang",
-	"dojo/_base/array",
-	"dojo/dom-construct",
-	"dojo/dom",
 	"dojo/on",
 	"dojo/query",
-	"dojo/text!./templates/GuestBook.html",
-	"dijit/form/ValidationTextBox",
-	"dijit/form/Button",
+	"dojo/dom-style",
+	"dojo/dom",
+	"dojo/text!./templates/Greeting.html",
 	"dijit/registry",
-	"./Greeting",
-	"../GuestbookStore",
+	"dijit/form/Button",
+	"dijit/form/Form",
+	"dijit/form/TextBox",
 	"./_ViewBaseMixin"
-], function(declare, baseFx, lang, array, domConstruct,dom, on, query, template, ValidationTextBox,
-			_WidgetsInTemplateMixin, registry, Greeting, GuestbookStore, _ViewBaseMixin){
 
-		return declare([_ViewBaseMixin], {
+], function(declare, baseFx, lang, on, query, domStyle, dom, template,
+			registry, button, form, textbox, _ViewBaseMixin){
+
+		return declare("WidgetGreeting", [_ViewBaseMixin], {
 
 			templateString: template,
 			guestbookStore: null,
 			guestbookName: "",
+			greeting_id: "",
+			author: "",
+			content: "",
+			date: "",
 
 			constructor: function(data){
 				this.guestbookName = data.guestbook_name;
-				this.guestbookStore = new GuestbookStore();
-				this.guestbookStore.set("guestbookName", this.guestbookName);
+				this.greeting_id = data.greeting_id;
+				this.content = data.content;
+				this.date = data.date;
+				if (data.updated_by !== "None"){
+					this.author = data.updated_by;
+				}else{
+					this.author = "Anonymous Person";
+				}
+				this.guestbookStore = data.guestbook_store;
 			},
 
 			postCreate: function(data){
 				this.inherited(arguments);
-				this.refreshGreetings();
 
 				this.own(
-					on(this.switchGuestbookButton,
-						"click", lang.hitch(this, "changeGuestBook")),
-					on(this.submitNewGreetingButton,
-						"click", lang.hitch(this, "addNewGreeting"))
+					on(this.deleteButton,
+						"click", lang.hitch(this, "deleteGreeting")),
+					on(this.openEditFormButton,
+						"click", lang.hitch(this, "openEditForm")),
+					on(this.submitUpdateGreetingButton,
+						"click", lang.hitch(this, "updateGreeting"))
 				);
 			},
 
-			changeGuestBook: function(){
-				this.guestbookName = this.textSwitchGuestbook.get("value");
-				this.refreshGreetings();
-			},
-
-			clearGreetings: function(){
-				array.forEach(query(".widgetGreeting"), function(greetingNode){
-					var widget = registry.byNode(greetingNode);
-					widget.destroy();
-				})
-			},
-
-			getGreetings: function(){
+			deleteGreeting: function(){
 				this.guestbookStore.set("guestbookName", this.guestbookName);
-				this.guestbookStore.getGreetings("")
-					.then(lang.hitch(this, function(result){
-						var greetings = result.greetings;
-						var docFragment = document.createDocumentFragment();
-						var arrayWidgetGreeting = [];
-						array.forEach(greetings, lang.hitch(this, function(greeting){
-								var data = {
-									"guestbook_store": this.guestbookStore,
-									"guestbook_name": result.guestbook_name,
-									"greeting_id": greeting.greeting_id,
-									"updated_by": greeting.greeting_auth,
-									"content": greeting.greeting_content,
-									"date": greeting.greeting_date
-								}
-								var greeting = new Greeting(data);
-								docFragment.appendChild(greeting.domNode);
-								arrayWidgetGreeting.push(greeting);
-							})
-						);
-						domConstruct.place(docFragment, "greetings", "before");
-						array.forEach(arrayWidgetGreeting, lang.hitch(this, function(greeting){
-								greeting.startup();
-							})
-						);
-					}), function(error){
-					});
+				this.guestbookStore.deleteGreeting(this.greeting_id)
+					.then(lang.hitch(this, function(data){
+						alert("Delete Success");
+						this.destroyRecursive();
+				}), function(error){
+					alert(error);
+				});
 			},
 
-			refreshGreetings: function(){
-				this.clearGreetings();
-				this.getGreetings();
+			openEditForm: function(){
+				this.guestbookStore.set("guestbookName", this.guestbookName);
+				this.guestbookStore.getGreetingDetail(this.greeting_id)
+					.then(lang.hitch(this, function(data){
+						var formNode = this.editFormNode;
+						domStyle.set(formNode, {"display": "block"});
+						this.textEditGreeting.set("value", data.content);
+				}), function(error){
+					alert(error);
+				});
 			},
 
-			addNewGreeting: function(){
-				if (this.textNewGreeting.validate() == true) {
-					var messageGreeting = this.textNewGreeting.get("value");
+			updateGreeting: function(){
+				if (this.textEditGreeting.validate() == true) {
+					this.content = this.textEditGreeting.value
 					this.guestbookStore.set("guestbookName", this.guestbookName);
-					this.guestbookStore.addGreeting(messageGreeting)
-						.then(lang.hitch(this, function (data) {
-							alert("Insert Success");
-							this.textNewGreeting.set("value", "");
-							this.refreshGreetings();
+					this.guestbookStore.updateGreeting(this.greeting_id, this.content)
+						.then(lang.hitch(this, function () {
+							alert("Update Success");
+							this.contentNode.innerHTML = this.content
+							var formNode = this.editFormNode;
+							domStyle.set(formNode, {"display": "none"});
 						}), function (error) {
 							alert(error);
-						}
-					)
+						})
 				}else{
-					alert("Form invalid");
+					alert("Form Invalid");
 				}
 			}
 		});
