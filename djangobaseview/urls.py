@@ -7,4 +7,5 @@ from django.conf.urls import patterns, include, url
 urlpatterns = patterns('',
 	url(r'^', include('guestbook.urls')),
 	url(r'^api/', include('api.urls')),
+	url(r'^dojo/', include('dojo.urls')),
 )

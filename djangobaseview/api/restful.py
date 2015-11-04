@@ -53,13 +53,20 @@ class GetListView(JSONResponseMixin, FormView):
 		return self.render_to_response(data)
 
 	def post(self, request, *args, **kwargs):
+		try:
+			json_object = json.loads(self.request.body)
+
+		except ValueError:
+			self.request.POST = QueryDict(self.request.body)
+		else:
+			self.request.POST = json_object
 		form_class = self.get_form_class()
 		form = self.get_form(form_class)
-		# logging.info(form_class)
 		if not form.is_valid():
 			return HttpResponse(status=400)
 		guestbook_name = self.request.GET.get('guestbook_name',Guestbook.get_default_guestbook())
 		content = form.cleaned_data['guestbook_mesage']
+		logging.info(content)
 		new_greeting = Greeting.add_greeting(content, guestbook_name)
 		if new_greeting:
 			return HttpResponse(status=204)
@@ -82,7 +89,6 @@ class ResourceSinge(JSONResponseMixin, FormView):
 		guestbook_name = kwargs.get('guestbook_name',Guestbook.get_default_guestbook())
 		greeting_id = kwargs.get('id', None)
 		greeting = Greeting.get_greeting(guestbook_name, greeting_id)
-
 		if not greeting:
 			return HttpResponse(status=404)
 		data = {
@@ -96,17 +102,22 @@ class ResourceSinge(JSONResponseMixin, FormView):
 		return self.render_to_response(data)
 
 	def put(self, request, *args, **kwargs):
+
 		try:
 			json_object = json.loads(self.request.body)
-
 		except ValueError:
 			self.request.POST = QueryDict(self.request.body)
 		else:
 			self.request.POST = json_object
 		form_class = self.get_form_class()
 		form = self.get_form(form_class)
-		update_greeting = self.update_resources(form, **kwargs)
-		if update_greeting:
+		if not form.is_valid():
+			return HttpResponse(status=400)
+		guestbook_name = kwargs.get('guestbook_name',Guestbook.get_default_guestbook())
+		greeting_id = kwargs.get('id')
+		content = form.cleaned_data['guestbook_mesage']
+		new_greeting = Greeting.update_greeting(content, guestbook_name, greeting_id)
+		if new_greeting:
 			return HttpResponse(status=204)
 		else:
 			return HttpResponse(status=404)

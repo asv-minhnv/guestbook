@@ -1,9 +1,8 @@
 from django.conf.urls import patterns,url
-# from api.views import IndexView
-from api.restful import GetListView,ResourceSinge
+from django.views.generic import TemplateView
 
 urlpatterns = patterns('',
-	url(r'^guestbook/(?P<guestbook_name>.+)/greeting/(?P<id>\d+)$', ResourceSinge.as_view()),
-	url(r'^guestbook/(?P<guestbook_name>).+/greeting/$', GetListView.as_view()),
+	url(r'^$', TemplateView.as_view(template_name='guestbook/dojo-guestbook.html')),
+
 
 )
