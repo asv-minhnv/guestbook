@@ -1,4 +1,3 @@
-import logging
 import urllib
 from google.appengine.api import mail
 from google.appengine.api import users
