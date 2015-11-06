@@ -1,10 +1,8 @@
 define([
 	"dojo/_base/declare",
-	"dojo/_base/fx",
 	"dojo/_base/lang",
 	"dojo/_base/array",
 	"dojo/dom-construct",
-	"dojo/dom",
 	"dojo/on",
 	"dojo/query",
 	"dojo/text!./templates/Guestbook.html",
@@ -14,7 +12,7 @@ define([
 	"./Greeting",
 	"../GuestbookStore",
 	"./_ViewBaseMixin"
-], function(declare, baseFx, lang, array, domConstruct,dom, on, query, template, ValidationTextBox,
+], function(declare, lang, array, domConstruct, on, query, template, ValidationTextBox,
 			_WidgetsInTemplateMixin, registry, Greeting, GuestbookStore, _ViewBaseMixin){
 
 		return declare([_ViewBaseMixin], {
@@ -65,9 +63,9 @@ define([
 									"guestbook_store": this.guestbookStore,
 									"guestbook_name": result.guestbook_name,
 									"greeting_id": greeting.greeting_id,
-									"updated_by": greeting.greeting_auth,
-									"content": greeting.greeting_content,
-									"date": greeting.greeting_date
+									"updated_by": greeting.updated_by,
+									"content": greeting.content,
+									"date": greeting.date
 								}
 								var greeting = new Greeting(data);
 								docFragment.appendChild(greeting.domNode);

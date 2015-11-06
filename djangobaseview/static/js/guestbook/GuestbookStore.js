@@ -12,14 +12,13 @@ define([
 			return this.guestbookName;
 		},
 
-		_guestbookNameSetter: function(guestbook_name){
-			this.guestbookName = guestbook_name;
+		_guestbookNameSetter: function(guestbookName){
+			this.guestbookName = guestbookName;
 		},
 
 		constructor: function(){
 			this.watch("guestbookName", function(name, oldValue, value){
 				if (oldValue !== value){
-					this.guestbookName = value;
 					this.jsonRest = new JsonRest({
 						target: "/api/guestbook/" + this.guestbookName + "/greeting/",
 						headers: {"X-CSRFToken": cookie("csrftoken")}
@@ -28,33 +27,34 @@ define([
 			});
 		},
 
-		getGreetings: function(guestbook_name, cursor){
+		getGreetings: function(guestbookName, cursor){
+			this.guestbookName = guestbookName;
 			return this.jsonRest.query({
 				"cursor" : cursor
 			});
 		},
 
-		addGreeting: function(guestbook_mesage){
+		addGreeting: function(guestbookMesage){
 			return this.jsonRest.add({
 				"guestbook_name": this.guestbookName,
-				"guestbook_mesage": guestbook_mesage
+				"guestbook_mesage": guestbookMesage
 			});
 		},
 
-		deleteGreeting: function(greeting_id){
-			return this.jsonRest.remove(greeting_id);
+		deleteGreeting: function(greetingId){
+			return this.jsonRest.remove(greetingId);
 		},
 
-		getGreetingDetail: function(greeting_id){
-			console.log(this.jsonRest.get(greeting_id))
-			return this.jsonRest.get(greeting_id);
+		getGreetingDetail: function(greetingId){
+			//console.log(this.jsonRest.get(greetingId))
+			return this.jsonRest.get(greetingId);
 		},
 
-		updateGreeting: function(greeting_id, guestbook_mesage){
+		updateGreeting: function(greetingId, guestbook_mesage){
 			return this.jsonRest.put({
 				"guestbook_name": this.guestbookName,
-				"guestbook_mesage": guestbook_mesage,
-				"id": greeting_id
+				"guestbook_mesage": guestbookMesage,
+				"greeting_id": greetingId
 			});
 		}
 	});

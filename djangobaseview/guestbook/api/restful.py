@@ -2,10 +2,9 @@ import json
 import logging
 from django import forms
 from django.http import HttpResponse, QueryDict
-from django.views.generic.edit import FormView
-
+from django.views.generic.edit import FormView, BaseDetailView
 from guestbook.models import Greeting, Guestbook
-
+from guestbook.forms import SignForm, EditForm
 
 class JSONResponseMixin(object):
 	def render_to_response(self, context):
@@ -37,10 +36,8 @@ class GetListView(JSONResponseMixin, FormView):
 	form_class = SignForm
 	def get(self, request, *args, **kwargs):
 		guestbook_name = self.request.GET.get('guestbook_name',Guestbook.get_default_guestbook())
-		count= 20
 		url_safe = self.request.GET.get('cursor')
-		logging.info(url_safe)
-		greetings, next_cursor, is_more = Greeting.get_greeting_with_cursor(
+		greetings, next_cursor, is_more = Greeting.greeting_to_dict(
 			url_safe=url_safe,
 			guestbook_name=guestbook_name,
 		)
@@ -52,6 +49,7 @@ class GetListView(JSONResponseMixin, FormView):
 		}
 		return self.render_to_response(data)
 
+
 	def post(self, request, *args, **kwargs):
 		try:
 			json_object = json.loads(self.request.body)
@@ -62,27 +60,25 @@ class GetListView(JSONResponseMixin, FormView):
 			self.request.POST = json_object
 		form_class = self.get_form_class()
 		form = self.get_form(form_class)
-		if not form.is_valid():
-			return HttpResponse(status=400)
-		guestbook_name = self.request.GET.get('guestbook_name',Guestbook.get_default_guestbook())
+		if form.is_valid():
+			return self.form_valid(form)
+		else:
+			return self.form_invalid(form)
+
+	def form_invalid(self, form):
+		return HttpResponse(status=400)
+
+	def form_valid(self, form):
+		guestbook_name = form.cleaned_data['guestbook_name']
 		content = form.cleaned_data['guestbook_mesage']
-		logging.info(content)
-		new_greeting = Greeting.add_greeting(content, guestbook_name)
-		if new_greeting:
+		new_greeting_key = Greeting.add_greeting(content, guestbook_name)
+		if new_greeting_key:
 			return HttpResponse(status=204)
 		else:
 			return HttpResponse(status=404)
 
 
-class EditForm(forms.Form):
-	guestbook_mesage = forms.CharField(
-		widget=forms.Textarea,
-		label='Guestkook mesage',
-		max_length=100,
-	)
-
-
-class ResourceSinge(JSONResponseMixin, FormView):
+class ResourceSingle(JSONResponseMixin, BaseDetailView):
 
 	form_class = EditForm
 	def get(self, request, *args, **kwargs):
@@ -91,14 +87,7 @@ class ResourceSinge(JSONResponseMixin, FormView):
 		greeting = Greeting.get_greeting(guestbook_name, greeting_id)
 		if not greeting:
 			return HttpResponse(status=404)
-		data = {
-			"greeting_id": greeting.key.id(),
-			"content": greeting.content,
-			"date": str(greeting.date),
-			"updated_by": str(greeting.author),
-			"updated_date": str(greeting.update_date),
-			"guestbook_name": guestbook_name,
-		}
+		data = Greeting.to_dict( greeting, guestbook_name);
 		return self.render_to_response(data)
 
 	def put(self, request, *args, **kwargs):
@@ -111,13 +100,22 @@ class ResourceSinge(JSONResponseMixin, FormView):
 			self.request.POST = json_object
 		form_class = self.get_form_class()
 		form = self.get_form(form_class)
-		if not form.is_valid():
-			return HttpResponse(status=400)
-		guestbook_name = kwargs.get('guestbook_name',Guestbook.get_default_guestbook())
-		greeting_id = kwargs.get('id')
+		if form.is_valid():
+			return self.form_valid(form)
+		else:
+			return self.form_invalid(form)
+
+
+	def form_invalid(self, form):
+		return HttpResponse(status=400)
+
+	def form_valid(self, form):
+
+		guestbook_name = form.cleaned_data['guestbook_name']
+		greeting_id = form.cleaned_data['greeting_id']
 		content = form.cleaned_data['guestbook_mesage']
-		new_greeting = Greeting.update_greeting(content, guestbook_name, greeting_id)
-		if new_greeting:
+		update_greeting_key = Greeting.update_greeting(content, guestbook_name, greeting_id)
+		if update_greeting_key:
 			return HttpResponse(status=204)
 		else:
 			return HttpResponse(status=404)
@@ -125,9 +123,8 @@ class ResourceSinge(JSONResponseMixin, FormView):
 	def delete(self, *args, **kwargs):
 		guestbook_name = kwargs.get('guestbook_name',Guestbook.get_default_guestbook())
 		greeting_id = kwargs.get('id', None)
-		detete_greeting = Greeting.delete_greeting(guestbook_name, greeting_id)
-		logging.info(guestbook_name)
-		if detete_greeting is None:
+		detete_greeting_key = Greeting.delete_greeting(guestbook_name, greeting_id)
+		if detete_greeting_key is None:
 			return HttpResponse(status=204)
 		else:
 			return HttpResponse(status=404)

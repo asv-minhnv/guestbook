@@ -3,12 +3,11 @@ from google.appengine.api import mail
 from google.appengine.api import users
 from google.appengine.api import taskqueue
 from django.contrib import messages
-from django import forms
 from django.http.response import HttpResponse
 from django.views.generic import TemplateView
 from django.views.generic.edit import FormView
 from guestbook.models import Greeting, Guestbook
-
+from guestbook.forms import SignForm, EditForm,DeleteForm
 
 
 class IndexView(TemplateView):
@@ -43,18 +42,6 @@ class IndexView(TemplateView):
 		return template_values
 
 
-class SignForm(forms.Form):
-	guestbook_name = forms.CharField(
-		label='Guestbook name',
-		max_length=50
-	)
-	guestbook_mesage = forms.CharField(
-		widget=forms.Textarea,
-		label='Guestkook mesage',
-		max_length=100
-	)
-
-
 class SignView(FormView):
 	template_name = 'guestbook/sign.html'
 	form_class = SignForm
@@ -78,18 +65,6 @@ class SignView(FormView):
 	def form_invalid(self, form):
 		messages.warning(self.request, 'Please input field!')
 		return super(SignView, self).form_invalid(form)
-
-
-class DeleteForm(forms.Form):
-	guestbook_name = forms.CharField(
-		widget=forms.HiddenInput(),
-		label='Guestbook name',
-		max_length=50
-	)
-	greeting_id = forms.IntegerField(
-		widget=forms.HiddenInput(),
-		label='Greeeting id ',
-	)
 
 
 class DeleteView(FormView):
@@ -119,23 +94,6 @@ class DeleteView(FormView):
 	def form_invalid(self, form):
 		messages.warning(self.request, 'Can not delete Greeting')
 		return super(DeleteView, self).form_invalid(form)
-
-		
-class EditForm(forms.Form):
-	guestbook_name = forms.CharField(
-		widget=forms.HiddenInput(),
-		label='Guestbook name',
-		max_length=50
-	)
-	greeting_id = forms.IntegerField(
-		widget=forms.HiddenInput(),
-		label='Greeeting id ',
-	)
-	guestbook_mesage = forms.CharField(
-		widget=forms.Textarea,
-		label='Guestkook mesage',
-		max_length=100
-	)
 
 
 class EditView(FormView):

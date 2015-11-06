@@ -1,13 +1,10 @@
 define([
 	"dojo/_base/config",
-	"dojo/_base/window",
-	"dojo/_base/array",
 	"dojo/parser",
 	"dojo/ready",
 	"dojo/dom",
 	"./view/Guestbook",
-	"dojo/domReady!"
-], function(config, win, array, parser, ready, dom, Guestbook) {
+], function(config, parser, ready, dom, Guestbook) {
 
 	ready(function() {
 		if (!config.parseOnLoad) {

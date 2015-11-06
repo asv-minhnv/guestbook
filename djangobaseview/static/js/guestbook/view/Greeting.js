@@ -1,20 +1,12 @@
 define([
 	"dojo/_base/declare",
-	"dojo/_base/fx",
 	"dojo/_base/lang",
 	"dojo/on",
-	"dojo/query",
 	"dojo/dom-style",
-	"dojo/dom",
 	"dojo/text!./templates/Greeting.html",
-	"dijit/registry",
-	"dijit/form/Button",
-	"dijit/form/Form",
-	"dijit/form/TextBox",
 	"./_ViewBaseMixin"
 
-], function(declare, baseFx, lang, on, query, domStyle, dom, template,
-			registry, button, form, textbox, _ViewBaseMixin){
+], function(declare, lang, on, domStyle, template, _ViewBaseMixin){
 
 		return declare("WidgetGreeting", [_ViewBaseMixin], {
 

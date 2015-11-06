@@ -1,4 +1,6 @@
 import datetime
+import logging
+import array
 from google.appengine.api import users
 from google.appengine.ext import ndb
 from google.appengine.api import memcache
@@ -37,9 +39,12 @@ class Greeting(ndb.Model):
 		if users.get_current_user():
 			greeting.author = users.get_current_user()
 		greeting.content = content
-		new_greeting = greeting.put()
+		try:
+			new_greeting_key = greeting.put()
+		except Exception as e:
+			print '%s (%s)' % (e.message, type( e ))
 		memcache.flush_all()
-		return new_greeting
+		return new_greeting_key
 
 	@classmethod
 	def update_greeting(cls, content, guestbook_name, greeting_id):
@@ -47,9 +52,12 @@ class Greeting(ndb.Model):
 		greeting = greeting_key.get()
 		greeting.content = content
 		greeting.update_date = datetime.datetime.now()
-		update_greeting = greeting.put()
+		try:
+			update_greeting_key = greeting.put()
+		except Exception as e:
+			print '%s (%s)' % (e.message, type( e ))
 		memcache.flush_all()
-		return update_greeting
+		return update_greeting_key
 
 	@classmethod
 	def get_greeting(cls, guestbook_name, greeting_id):
@@ -77,17 +85,29 @@ class Greeting(ndb.Model):
 	def get_greeting_with_cursor(cls, url_safe, guestbook_name, count=20):
 		start_cursor = Cursor(urlsafe=url_safe)
 		greetings, next_cursor, is_more = cls.query(ancestor=Guestbook.get_key_guestbook(guestbook_name)).order(-cls.date).fetch_page(count, start_cursor=start_cursor)
+		return greetings, next_cursor, is_more
 
-		greeting_json = [
-			{
-				"greeting_id": greeting.key.id(),
-				"greeting_auth": str(greeting.author),
-				"greeting_content": str(greeting.content),
-				"greeting_date": str(greeting.date)
-			} for greeting in greetings
-		]
 
+	@classmethod
+	def greeting_to_dict(cls, url_safe, guestbook_name, count=20):
+		greetings, next_cursor, is_more = cls.get_greeting_with_cursor(url_safe,guestbook_name,count)
+		greeting_json = []
+		for greeting in greetings:
+			greeting_json.append(cls.to_dict(greeting, guestbook_name))
 		return greeting_json, next_cursor, is_more
+
+
+	@classmethod
+	def to_dict(cls, greeting, guestbook_name):
+		data = {
+			"greeting_id": greeting.key.id(),
+			"content": greeting.content,
+			"date": str(greeting.date),
+			"updated_by": str(greeting.author),
+			"updated_date": str(greeting.update_date),
+			"guestbook_name": guestbook_name,
+		}
+		return data;
 
 
 class Guestbook(ndb.Model):
