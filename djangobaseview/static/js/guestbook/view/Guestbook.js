@@ -5,15 +5,15 @@ define([
 	"dojo/dom-construct",
 	"dojo/on",
 	"dojo/query",
-	"dojo/text!./templates/Guestbook.html",
 	"dijit/form/ValidationTextBox",
 	"dijit/form/Button",
 	"dijit/registry",
 	"./Greeting",
 	"../GuestbookStore",
-	"./_ViewBaseMixin"
-], function(declare, lang, array, domConstruct, on, query, template, ValidationTextBox,
-			_WidgetsInTemplateMixin, registry, Greeting, GuestbookStore, _ViewBaseMixin){
+	"./_ViewBaseMixin",
+	"dojo/text!./templates/Guestbook.html",
+], function(declare, lang, array, domConstruct, on, query, ValidationTextBox,
+			_WidgetsInTemplateMixin, registry, Greeting, GuestbookStore, _ViewBaseMixin, template){
 
 		return declare([_ViewBaseMixin], {
 

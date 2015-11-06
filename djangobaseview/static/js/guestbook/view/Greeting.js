@@ -3,10 +3,10 @@ define([
 	"dojo/_base/lang",
 	"dojo/on",
 	"dojo/dom-style",
+	"./_ViewBaseMixin",
 	"dojo/text!./templates/Greeting.html",
-	"./_ViewBaseMixin"
 
-], function(declare, lang, on, domStyle, template, _ViewBaseMixin){
+], function(declare, lang, on, domStyle, _ViewBaseMixin, template){
 
 		return declare("WidgetGreeting", [_ViewBaseMixin], {
 
