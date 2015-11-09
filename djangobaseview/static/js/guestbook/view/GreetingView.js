@@ -45,26 +45,31 @@ define([
 			},
 
 			deleteGreeting: function(){
-				this.guestbookStore.set("guestbookName", this.guestbookName);
-				this.guestbookStore.deleteGreeting(this.greeting_id)
-					.then(lang.hitch(this, function(data){
-						alert("Delete Success");
-						this.destroyRecursive();
-				}), function(error){
-					alert(error);
-				});
+				this.guestbookStore.deleteGreeting(this.greeting_id,this.guestbookName)
+					.then(
+						lang.hitch(this, function(data){
+							alert("Delete Success");
+							this.destroyRecursive();
+						}),
+						lang.hitch(this,function(error) {
+							alert(error);
+						})
+					);
 			},
 
 			openEditForm: function(){
 				this.guestbookStore.set("guestbookName", this.guestbookName);
 				this.guestbookStore.getGreetingDetail(this.greeting_id)
-					.then(lang.hitch(this, function(data){
-						var formNode = this.editFormNode;
-						domStyle.set(formNode, {"display": "block"});
-						this.textEditGreeting.set("value", data.content);
-				}), function(error){
-					alert(error);
-				});
+					.then(
+						lang.hitch(this, function(data){
+							var formNode = this.editFormNode;
+							domStyle.set(formNode, {"display": "block"});
+							this.textEditGreeting.set("value", data.content);
+						}),
+						lang.hitch(this,function(error) {
+							alert(error);
+						})
+					);
 			},
 
 			updateGreeting: function(){
@@ -72,14 +77,17 @@ define([
 					this.content = this.textEditGreeting.value
 					this.guestbookStore.set("guestbookName", this.guestbookName);
 					this.guestbookStore.updateGreeting(this.greeting_id, this.content)
-						.then(lang.hitch(this, function () {
-							alert("Update Success");
-							this.contentNode.innerHTML = this.content
-							var formNode = this.editFormNode;
-							domStyle.set(formNode, {"display": "none"});
-						}), function (error) {
-							alert(error);
-						})
+						.then(
+							lang.hitch(this, function () {
+								alert("Update Success");
+								this.contentNode.innerHTML = this.content
+								var formNode = this.editFormNode;
+								domStyle.set(formNode, {"display": "none"});
+							}),
+							lang.hitch(this,function(error) {
+								alert(error);
+							})
+						)
 				}else{
 					alert("Form Invalid");
 				}
