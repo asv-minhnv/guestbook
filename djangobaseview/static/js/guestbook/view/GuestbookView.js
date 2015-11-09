@@ -13,21 +13,15 @@ define([
 	"./_ViewBaseMixin",
 	"dojo/text!./templates/Guestbook.html",
 ], function(declare, lang, array, domConstruct, on, query, ValidationTextBox,
-			_WidgetsInTemplateMixin, registry, Greeting, GuestbookStore, _ViewBaseMixin, template){
+			_WidgetsInTemplateMixin, registry, Greeting, GuestbookStore, _ViewBaseMixin, template) {
 
 		return declare([_ViewBaseMixin], {
 
 			templateString: template,
-			guestbookStore: null,
 			guestbookName: "",
+			guestbookStore: null,
 
-			constructor: function(data){
-				this.guestbookName = data.guestbookName;
-				this.guestbookStore = new GuestbookStore();
-				this.guestbookStore.set("guestbookName", this.guestbookName);
-			},
-
-			postCreate: function(data){
+			postCreate: function(data) {
 				this.inherited(arguments);
 				this.refreshGreetings();
 
@@ -39,45 +33,44 @@ define([
 				);
 			},
 
-			changeGuestBook: function(){
-				this.guestbookName = this.textSwitchGuestbook.get("value");
+			changeGuestBook: function() {
+				this.guestbookName = this.contentSwitchGuestbook.get("value");
 				this.refreshGreetings();
 			},
 
-			clearGreetings: function(){
-				array.forEach(query(".widgetGreeting"), function(greetingNode){
+			clearGreetings: function() {
+				array.forEach(query(".greetingView"), function(greetingNode){
 					var widget = registry.byNode(greetingNode);
 					widget.destroy();
 				})
 			},
 
-			getGreetings: function(){
-				this.guestbookStore.set("guestbookName", this.guestbookName);
-				this.guestbookStore.getGreetings("")
+			getGreetings: function() {
+				//this.guestbookStore.set("guestbookName", this.guestbookName);
+				//console.log(this.guestbookName);
+				this.guestbookStore.getGreetings(this.guestbookName)
 					.then(
 						lang.hitch(this, function(result){
 							var greetings = result.greetings;
 							var docFragment = document.createDocumentFragment();
 							var arrayWidgetGreeting = [];
-							array.forEach(greetings, lang.hitch(this, function(greeting){
-									var data = {
-										"guestbook_store": this.guestbookStore,
-										"guestbook_name": result.guestbook_name,
-										"greeting_id": greeting.greeting_id,
-										"updated_by": greeting.updated_by,
-										"content": greeting.content,
-										"date": greeting.date
-									}
-									var greeting = new Greeting(data);
-									docFragment.appendChild(greeting.domNode);
-									arrayWidgetGreeting.push(greeting);
-								})
-							);
+							array.forEach(greetings, lang.hitch(this, function(greeting) {
+								var data = {
+									"guestbook_store": this.guestbookStore,
+									"guestbook_name": result.guestbook_name,
+									"greeting_id": greeting.greeting_id,
+									"updated_by": greeting.updated_by !== "None"?greeting.updated_by:"Anonymous Person",
+									"content": greeting.content,
+									"date": greeting.date
+								}
+								var greeting = new Greeting(data);
+								docFragment.appendChild(greeting.domNode);
+								arrayWidgetGreeting.push(greeting);
+							}));
 							domConstruct.place(docFragment, "greetings", "before");
-							array.forEach(arrayWidgetGreeting, lang.hitch(this, function(greeting){
-									greeting.startup();
-								})
-							);
+							array.forEach(arrayWidgetGreeting, lang.hitch(this, function(greeting) {
+								greeting.startup();
+							}));
 						}),
 						lang.hitch(this,function(error) {
 							alert(error);
@@ -85,27 +78,27 @@ define([
 					);
 			},
 
-			refreshGreetings: function(){
+			refreshGreetings: function() {
 				this.clearGreetings();
 				this.getGreetings();
 			},
 
-			addNewGreeting: function(){
-				if (this.textNewGreeting.validate() == true) {
-					var messageGreeting = this.textNewGreeting.get("value");
+			addNewGreeting: function() {
+				if (this.contentNewGreeting.validate() == true) {
+					var messageGreeting = this.contentNewGreeting.get("value");
 					this.guestbookStore.set("guestbookName", this.guestbookName);
 					this.guestbookStore.addGreeting(messageGreeting)
 						.then(
 							lang.hitch(this, function (data) {
 								alert("Insert Success");
-								this.textNewGreeting.set("value", "");
+								this.contentNewGreeting.set("value", "");
 								this.refreshGreetings();
 							}),
 							lang.hitch(this,function(error) {
 								alert(error);
 							})
 						)
-				}else{
+				} else {
 					alert("Form invalid");
 				}
 			}

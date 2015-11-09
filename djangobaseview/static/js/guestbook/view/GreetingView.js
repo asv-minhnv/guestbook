@@ -4,34 +4,32 @@ define([
 	"dojo/on",
 	"dojo/dom-style",
 	"./_ViewBaseMixin",
+	"../models/Greeting",
 	"dojo/text!./templates/Greeting.html",
 
-], function(declare, lang, on, domStyle, _ViewBaseMixin, template){
 
-		return declare("WidgetGreeting", [_ViewBaseMixin], {
+], function(declare, lang, on, domStyle, _ViewBaseMixin, Greeting, template) {
+
+		return declare("GreetingView", [_ViewBaseMixin], {
 
 			templateString: template,
 			guestbookStore: null,
-			guestbookName: "",
-			greeting_id: "",
-			author: "",
-			content: "",
-			date: "",
+			model : new Greeting(),
 
-			constructor: function(data){
-				this.guestbookName = data.guestbook_name;
-				this.greeting_id = data.greeting_id;
-				this.content = data.content;
-				this.date = data.date;
-				if (data.updated_by !== "None"){
-					this.author = data.updated_by;
-				}else{
-					this.author = "Anonymous Person";
+			constructor: function(data) {
+				this.model.guestbookName = data.guestbook_name;
+				this.model.greeting_id = data.greeting_id;
+				this.model.content = data.content;
+				this.model.date = data.date;
+				if (data.updated_by !== "None") {
+					this.model.author = data.updated_by;
+				} else {
+					this.model.author = "Anonymous Person";
 				}
 				this.guestbookStore = data.guestbook_store;
 			},
 
-			postCreate: function(data){
+			postCreate: function(data) {
 				this.inherited(arguments);
 
 				this.own(
@@ -44,10 +42,10 @@ define([
 				);
 			},
 
-			deleteGreeting: function(){
-				this.guestbookStore.deleteGreeting(this.greeting_id,this.guestbookName)
+			deleteGreeting: function() {
+				this.guestbookStore.deleteGreeting(this.model.greeting_id, this.model.guestbookName)
 					.then(
-						lang.hitch(this, function(data){
+						lang.hitch(this, function(data) {
 							alert("Delete Success");
 							this.destroyRecursive();
 						}),
@@ -57,14 +55,13 @@ define([
 					);
 			},
 
-			openEditForm: function(){
-				this.guestbookStore.set("guestbookName", this.guestbookName);
-				this.guestbookStore.getGreetingDetail(this.greeting_id)
+			openEditForm: function() {
+				this.guestbookStore.getGreetingDetail(this.model.greeting_id, this.model.guestbookName)
 					.then(
-						lang.hitch(this, function(data){
+						lang.hitch(this, function(data) {
 							var formNode = this.editFormNode;
 							domStyle.set(formNode, {"display": "block"});
-							this.textEditGreeting.set("value", data.content);
+							this.contentTextbox.set("value", data.content);
 						}),
 						lang.hitch(this,function(error) {
 							alert(error);
@@ -72,15 +69,16 @@ define([
 					);
 			},
 
-			updateGreeting: function(){
-				if (this.textEditGreeting.validate() == true) {
-					this.content = this.textEditGreeting.value
-					this.guestbookStore.set("guestbookName", this.guestbookName);
-					this.guestbookStore.updateGreeting(this.greeting_id, this.content)
+			updateGreeting: function() {
+				if (this.contentTextbox.validate() == true) {
+					this.model.content = this.contentTextbox.value
+
+					this.guestbookStore.updateGreeting(this.model.greeting_id, this.model.content,this.model.guestbookName )
 						.then(
 							lang.hitch(this, function () {
 								alert("Update Success");
-								this.contentNode.innerHTML = this.content
+								console.log(this.contentNode)
+								this.contentNode.innerHTML = this.model.content
 								var formNode = this.editFormNode;
 								domStyle.set(formNode, {"display": "none"});
 							}),
@@ -88,7 +86,7 @@ define([
 								alert(error);
 							})
 						)
-				}else{
+				} else {
 					alert("Form Invalid");
 				}
 			}

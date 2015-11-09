@@ -3,15 +3,20 @@ define([
 	"dojo/parser",
 	"dojo/ready",
 	"dojo/dom",
-	"./view/Guestbook",
-], function(config, parser, ready, dom, Guestbook) {
+	"./view/GuestbookView",
+	"./GuestbookStore"
+], function(config, parser, ready, dom, GuestbookView, GuestbookStore) {
 
 	ready(function() {
 		if (!config.parseOnLoad) {
 			parser.parse();
 		}
-
-		var guestbook = new Guestbook({"guestbook_name": "default_guestbook"});
+		var guestbookName = "default_guestbook";
+		var store = new GuestbookStore({"guestbookName": guestbookName});
+		var guestbook = new GuestbookView({
+			"guestbookName" : guestbookName,
+			"guestbookStore" : store
+		});
 		var result = dom.byId("result");
 		guestbook.placeAt(result);
 	});

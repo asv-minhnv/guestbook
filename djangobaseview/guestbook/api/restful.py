@@ -18,18 +18,6 @@ class JSONResponseMixin(object):
 	def convert_context_to_json(context):
 		return json.dumps(context)
 
-class SignForm(forms.Form):
-	guestbook_name = forms.CharField(
-		label='Guestbook name',
-		max_length=50,
-		required = False
-	)
-	guestbook_mesage = forms.CharField(
-		widget=forms.Textarea,
-		label='Guestkook mesage',
-		max_length=100
-	)
-
 
 class GetListView(JSONResponseMixin, FormView):
 
