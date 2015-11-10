@@ -7,8 +7,7 @@ define([
 		greeting_id: "",
 		author: "",
 		content: "",
-		date: "",
-
+		date: ""
 	});
 });
 

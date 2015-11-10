@@ -25,7 +25,7 @@ class GetListView(JSONResponseMixin, FormView):
 	def get(self, request, *args, **kwargs):
 		guestbook_name = self.request.GET.get('guestbook_name',Guestbook.get_default_guestbook())
 		url_safe = self.request.GET.get('cursor')
-		greetings, next_cursor, is_more = Greeting.greeting_to_dict(
+		greetings, next_cursor, is_more = Greeting.get_greeting_with_cursor(
 			url_safe=url_safe,
 			guestbook_name=guestbook_name,
 		)
@@ -69,14 +69,15 @@ class GetListView(JSONResponseMixin, FormView):
 class ResourceSingle(JSONResponseMixin, BaseDetailView):
 
 	form_class = EditForm
+
 	def get(self, request, *args, **kwargs):
 		guestbook_name = kwargs.get('guestbook_name',Guestbook.get_default_guestbook())
 		greeting_id = kwargs.get('id', None)
 		greeting = Greeting.get_greeting(guestbook_name, greeting_id)
 		if not greeting:
 			return HttpResponse(status=404)
-		data = Greeting.to_dict( greeting, guestbook_name);
-		return self.render_to_response(data)
+		context = Greeting.to_dict( greeting, guestbook_name);
+		return self.render_to_response(context)
 
 	def put(self, request, *args, **kwargs):
 
