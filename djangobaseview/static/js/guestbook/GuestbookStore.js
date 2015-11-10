@@ -17,14 +17,13 @@ define([
 		},
 
 		constructor: function() {
-			console.log(this.guestbookName);
 			this.watch("guestbookName", function(name, oldValue, value) {
-				//if (oldValue !== value){
+				if (oldValue !== value){
 					this.jsonRest = new JsonRest({
 						target: "/api/guestbook/" + this.guestbookName + "/greeting/",
 						headers: {"X-CSRFToken": cookie("csrftoken")}
 					});
-				//}
+				}
 			});
 		},
 
@@ -48,12 +47,12 @@ define([
 			return this.jsonRest.remove(greetingId);
 		},
 
-		getGreetingDetail: function(greetingId,guestbookName){
+		getGreetingDetail: function(greetingId, guestbookName){
 			this.set("guestbookName", guestbookName);
 			return this.jsonRest.get(greetingId);
 		},
 
-		updateGreeting: function(greetingId, guestbookMesage,guestbookName) {
+		updateGreeting: function(greetingId, guestbookMesage, guestbookName) {
 			this.set("guestbookName", guestbookName);
 			return this.jsonRest.put({
 				"guestbook_name": this.guestbookName,

@@ -46,7 +46,6 @@ define([
 			},
 
 			getGreetings: function() {
-				//this.guestbookStore.set("guestbookName", this.guestbookName);
 				//console.log(this.guestbookName);
 				this.guestbookStore.getGreetings(this.guestbookName)
 					.then(
