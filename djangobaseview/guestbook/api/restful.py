@@ -1,8 +1,6 @@
 import json
-import logging
-from django import forms
 from django.http import HttpResponse, QueryDict
-from django.views.generic.edit import FormView, BaseDetailView
+from django.views.generic.edit import FormView
 from guestbook.models import Greeting, Guestbook
 from guestbook.forms import SignForm, EditForm
 
@@ -66,7 +64,7 @@ class GetListView(JSONResponseMixin, FormView):
 			return HttpResponse(status=404)
 
 
-class ResourceSingle(JSONResponseMixin, BaseDetailView):
+class ResourceSingle(JSONResponseMixin, FormView):
 
 	form_class = EditForm
 
@@ -76,7 +74,7 @@ class ResourceSingle(JSONResponseMixin, BaseDetailView):
 		greeting = Greeting.get_greeting(guestbook_name, greeting_id)
 		if not greeting:
 			return HttpResponse(status=404)
-		context = Greeting.to_dict( greeting, guestbook_name);
+		context = Greeting.to_dict( greeting, guestbook_name)
 		return self.render_to_response(context)
 
 	def put(self, request, *args, **kwargs):
