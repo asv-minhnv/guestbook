@@ -7,7 +7,10 @@ define([
 		greeting_id: "",
 		author: "",
 		content: "",
+		is_admin: "",
+		user_info: "",
 		date: ""
+
 	});
 });
 

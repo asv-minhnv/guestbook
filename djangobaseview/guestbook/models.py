@@ -108,6 +108,8 @@ class Greeting(ndb.Model):
 			"updated_by": str(greeting.author) if greeting.author != None else "",
 			"updated_date": str(greeting.update_date),
 			"guestbook_name": guestbook_name,
+			'is_admin': users.is_current_user_admin(),
+			'user_info': str(users.get_current_user()),
 		}
 		return data;
 
