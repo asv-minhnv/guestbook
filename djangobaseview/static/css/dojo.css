@@ -1,0 +1,53 @@
+.guestbookContent{
+	float: left;
+}
+.guestbookIitle{
+	font-size: 20px;
+	float:left
+}
+.guestbookFtem{
+	float:left; width: 100%;
+	margin-top: 10px;
+	border-bottom: thin solid black;
+	margin-bottom: 20px; padding-bottom: 20px;
+}
+.guestbookForm{
+	float:left; width: 100%;
+	margin-top: 10px;
+	border-bottom: thin solid black;
+	margin-bottom: 20px; padding-bottom: 20px;
+}
+.guestbookInput{
+	width: 96%;
+	height: 100px;
+	padding: 8px;
+}
+.listGreeting{
+	float:left;
+	width: 100%;
+}
+.greetingContent{
+	border: thin solid black;
+	border-radius: 5px;
+	padding: 10px;
+	line-height: 30px;
+	margin-bottom: 20px;
+	float:left;
+	width: 100%;
+}
+.greetingItem{
+	float:left;
+	width: 100%;
+}
+.greetingForm{
+	float:left; margin-top: 10px;
+	border-top: thin solid black;
+	padding-top: 10px; width: 100%;
+	display: none;
+}
+.greetingInput{
+	width: 96%;
+	height: 100px;
+	padding: 8px;
+}
+

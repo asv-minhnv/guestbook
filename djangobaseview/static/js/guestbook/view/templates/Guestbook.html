@@ -1,0 +1,19 @@
+<div class="guestbookContent">
+	<span class="guestbookTitle">
+		<strong>Guestbook</strong>
+	</span><br>
+	<div class="guestbookItem">
+		<input data-dojo-attach-point="contentSwitchGuestbook"
+				data-dojo-type="dijit/form/TextBox" value=${guestbookName} />
+		<button data-dojo-attach-point="switchGuestbookButton"
+				data-dojo-type="dijit/form/Button">Switch</button>
+	</div>
+	<div class="guestbookForm">
+		<input required="true" type="text"
+				  data-dojo-type="dijit/form/ValidationTextBox" data-dojo-attach-point="contentNewGreeting"
+				  data-dojo-props="regExp:'.{1,50}', invalidMessage:'Khong vuot qua 50 ki tu'"
+				  class="guestbookInput"/><br>
+		<button data-dojo-attach-point="submitNewGreetingButton">Add New Greeting</button>
+	</div>
+	<div id="greetings" class="listGreeting"></div>
+</div>

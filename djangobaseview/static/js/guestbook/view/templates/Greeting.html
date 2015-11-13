@@ -1,0 +1,21 @@
+<div class="greetingContent">
+	<div class="greetingItem">
+		<strong>GreetingID:</strong><span>${greeting_id}</span><br>
+		<strong>Updated by:</strong><span> ${updated_by}</span><br>
+		<strong>Date:</strong><span> ${date}</span></br>
+		<strong>Content:</strong><span data-dojo-attach-point="contentNode"> ${!content}</span><br>
+		<span><strong>Tool:</strong></span>
+
+		<button data-dojo-type="dijit/form/Button"
+				data-dojo-attach-point="deleteButton">Delete</button>
+		<button data-dojo-type="dijit/form/Button"
+				data-dojo-attach-point="openEditFormButton">Edit</button>
+	</div><br>
+	<div data-dojo-attach-point="editFormNode" class="greetingForm">
+		<input required="true" class="greetingInput" data-dojo-type="dijit/form/ValidationTextBox"
+				data-dojo-props="regExp:'.{1,50}', invalidMessage:'Khong vuot qua 50 ki tu.'"
+				data-dojo-attach-point="contentTextbox" />
+		<button data-dojo-type="dijit/form/Button"
+				data-dojo-attach-point="submitUpdateGreetingButton">Update</button>
+	</div>
+</div>

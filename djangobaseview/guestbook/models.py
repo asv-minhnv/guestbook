@@ -1,6 +1,10 @@
+import datetime
+import logging
+import array
 from google.appengine.api import users
 from google.appengine.ext import ndb
 from google.appengine.api import memcache
+from google.appengine.ext.ndb import Cursor
 
 DEFAULT_GUESTBOOK_NAME = 'default_guestbook'
 
@@ -16,6 +20,8 @@ class Greeting(ndb.Model):
 	author = ndb.UserProperty()
 	content = ndb.StringProperty(indexed=False)
 	date = ndb.DateTimeProperty(auto_now_add=True)
+	update_date = ndb.DateTimeProperty(auto_now_add=True)
+
 
 	@classmethod
 	def get_latest(cls, guestbook_name, count):
@@ -33,16 +39,25 @@ class Greeting(ndb.Model):
 		if users.get_current_user():
 			greeting.author = users.get_current_user()
 		greeting.content = content
-		greeting.put()
+		try:
+			new_greeting_key = greeting.put()
+		except Exception as e:
+			print '%s (%s)' % (e.message, type( e ))
 		memcache.flush_all()
+		return new_greeting_key
 
 	@classmethod
 	def update_greeting(cls, content, guestbook_name, greeting_id):
 		greeting_key = cls.get_key_by_id(guestbook_name,greeting_id)
 		greeting = greeting_key.get()
 		greeting.content = content
-		greeting.put()
+		greeting.update_date = datetime.datetime.now()
+		try:
+			update_greeting_key = greeting.put()
+		except Exception as e:
+			print '%s (%s)' % (e.message, type( e ))
 		memcache.flush_all()
+		return update_greeting_key
 
 	@classmethod
 	def get_greeting(cls, guestbook_name, greeting_id):
@@ -62,8 +77,41 @@ class Greeting(ndb.Model):
 	@classmethod
 	def delete_greeting(cls, guestbook_name, greeting_id):
 		greeting_key = cls.get_key_by_id(guestbook_name,greeting_id)
-		greeting_key.delete()
+		delete_greeting = greeting_key.delete()
 		memcache.flush_all()
+		return delete_greeting
+
+	@classmethod
+	def get_greeting_with_cursor(cls, url_safe, guestbook_name, count=20):
+		start_cursor = Cursor(urlsafe=url_safe)
+		greetings, next_cursor, is_more = cls.query(ancestor=Guestbook.get_key_guestbook(guestbook_name)).order(-cls.date).fetch_page(count, start_cursor=start_cursor)
+		greeting_json = cls.greeting_to_arraydict(greetings,guestbook_name)
+		return greeting_json, next_cursor, is_more
+
+
+	@classmethod
+	def greeting_to_arraydict(cls, greetings, guestbook_name):
+		# greetings, next_cursor, is_more = cls.get_greeting_with_cursor(url_safe,guestbook_name,count)
+		greeting_json = []
+		for greeting in greetings:
+			greeting_json.append(cls.to_dict(greeting, guestbook_name))
+		return greeting_json
+
+
+
+	@classmethod
+	def to_dict(cls, greeting, guestbook_name):
+		data = {
+			"greeting_id": greeting.key.id(),
+			"content": greeting.content,
+			"date": str(greeting.date),
+			"updated_by": str(greeting.author) if greeting.author != None else "",
+			"updated_date": str(greeting.update_date),
+			"guestbook_name": guestbook_name,
+			'is_admin': users.is_current_user_admin(),
+			'user_info': str(users.get_current_user()),
+		}
+		return data;
 
 
 class Guestbook(ndb.Model):
