@@ -7,7 +7,9 @@ decription: add guestbook with python and django
 # Instal dojo before run test
 
 download dojo 1.10.4: http://dojotoolkit.org/download/
+
 copy all to: djangobaseview/static/js
+
 ex:
  + djangobaseview/static/js/dijit
  + djangobaseview/static/js/dojo
