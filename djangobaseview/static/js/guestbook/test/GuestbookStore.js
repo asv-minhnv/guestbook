@@ -12,7 +12,7 @@ define([
 	"guestbook/GuestbookStore"
 ], function(doh, json, topic, array, declare, JsonRest, cookie, Stateful, sinon, GuestbookView, GuestbookStore) {
 
-	doh.register('guestbook.view.GuestbookStore', {
+	doh.register('guestbook.test.GuestbookStore', {
 
 		testQuery: sinon.test(function () {
 
