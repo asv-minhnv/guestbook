@@ -14,7 +14,7 @@ define([
 
 	doh.register('guestbook.test.GuestbookStore', {
 
-		testQuery: sinon.test(function () {
+		testGetGreeting: sinon.test(function () {
 
 			var deferred = new doh.Deferred(),
 				guestbookName = "default_guestbook";
@@ -36,7 +36,7 @@ define([
 			this.server.respond();
 			return deferred;
 		}),
-		testAddGuestbook: {
+		testAddGreeting: {
 
 			setUp: function() {
 				this.handles = [];
@@ -61,7 +61,7 @@ define([
 				return deferred;
 			})
 		},
-		testUpdateGuestbook: {
+		testUpdateGreeting: {
 
 			setUp: function() {
 				this.handles = [];
@@ -86,7 +86,7 @@ define([
 				return deferred;
 			})
 		},
-		testDetailGuestbook: {
+		testGetGreetingDetail: {
 			setUp: function() {
 				this.handles = [];
 			},
@@ -117,7 +117,7 @@ define([
 					return deferred;
 			})
 		},
-		testDeleteGuestbook: {
+		testDeleteGreeting: {
 			setUp: function() {
 				this.handles = [];
 			},
