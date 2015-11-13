@@ -4,7 +4,7 @@ define([
 	"dojo/cookie",
 	"dojo/Stateful"
 ], function(declare, JsonRest, cookie, Stateful) {
-	return declare([Stateful],{
+	return declare([Stateful], {
 		jsonRest: null,
 		guestbookName: null,
 		constructor: function() {
