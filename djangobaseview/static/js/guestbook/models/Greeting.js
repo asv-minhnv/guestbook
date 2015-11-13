@@ -10,6 +10,7 @@ define([
 		is_admin: "",
 		user_info: "",
 		date: ""
+
 	});
 });
 
