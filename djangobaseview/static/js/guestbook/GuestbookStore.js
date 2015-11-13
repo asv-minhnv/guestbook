@@ -4,10 +4,9 @@ define([
 	"dojo/cookie",
 	"dojo/Stateful"
 ], function(declare, JsonRest, cookie, Stateful) {
-	return declare([Stateful], {
+	return declare([Stateful],{
 		jsonRest: null,
 		guestbookName: null,
-
 		constructor: function() {
 			this.watch("guestbookName", function(name, oldValue, value) {
 				if (oldValue !== value){
