@@ -61,6 +61,62 @@ define([
 				return deferred;
 			})
 		},
+		testAddGreetingFalse: {
+
+			setUp: function() {
+				this.handles = [];
+			},
+			tearDown: function() {
+				array.forEach(this.handles, function(handle) {
+					handle.remove();
+				}, this);
+			},
+			runTest: sinon.test(function() {
+
+				var deferred = new doh.Deferred(),
+					guestbookName = "default_guestbook";
+				guestbookstore = new GuestbookStore({"guestbookName": guestbookName});
+				addSpy = sinon.spy();
+				this.handles.push(topic.subscribe('/api/guestbook/default_guestbook/greeting/', addSpy));
+				guestbookstore.addGreeting('guestbook message c').then(deferred.getTestCallback(function(result) {
+
+				}),
+				deferred.getTestCallback(function(error) {
+					doh.is(error.response.status, 404);
+				}));
+				this.server.respondWith([404, {'Content-Type': 'application/json'}, '']);
+				this.server.respond();
+				return deferred;
+			})
+		},
+		testAddGreetingInvalid: {
+
+			setUp: function() {
+				this.handles = [];
+			},
+			tearDown: function() {
+				array.forEach(this.handles, function(handle) {
+					handle.remove();
+				}, this);
+			},
+			runTest: sinon.test(function() {
+
+				var deferred = new doh.Deferred(),
+					guestbookName = "default_guestbook";
+				guestbookstore = new GuestbookStore({"guestbookName": guestbookName});
+				addSpy = sinon.spy();
+				this.handles.push(topic.subscribe('/api/guestbook/default_guestbook/greeting/', addSpy));
+				guestbookstore.addGreeting('guestbook message c').then(deferred.getTestCallback(function(result) {
+
+				}),
+				deferred.getTestCallback(function(error) {
+					doh.is(error.response.status, 400);
+				}));
+				this.server.respondWith([400, {'Content-Type': 'application/json'}, '']);
+				this.server.respond();
+				return deferred;
+			})
+		},
 		testUpdateGreeting: {
 
 			setUp: function() {
@@ -78,10 +134,66 @@ define([
 				updateSpy = sinon.spy();
 				this.handles.push(topic.subscribe('/api/guestbook/default_guestbook/greeting/5225978766819328', updateSpy));
 				//console.log(putSpy);
-				guestbookstore.updateGreeting(5225978766819328,'guestbook message b', guestbookName).then(deferred.getTestCallback(function(result) {
+				guestbookstore.updateGreeting(5225978766819328,'guestbook message b', guestbookName).then(deferred.getTestCallback(function(error) {
 					doh.is(updateSpy.callCount, 0);
 				}));
 				this.server.respondWith([204, {'Content-Type': 'application/json'}, '']);
+				this.server.respond();
+				return deferred;
+			})
+		},
+		testUpdateGreetingFalse: {
+
+			setUp: function() {
+				this.handles = [];
+			},
+			tearDown: function() {
+				array.forEach(this.handles, function(handle) {
+					handle.remove();
+				}, this);
+			},
+			runTest: sinon.test(function() {
+				var deferred = new doh.Deferred(),
+					guestbookName = "default_guestbook";
+				guestbookstore = new GuestbookStore({"guestbookName": guestbookName});
+				updateSpy = sinon.spy();
+				this.handles.push(topic.subscribe('/api/guestbook/default_guestbook/greeting/5225978766819328', updateSpy));
+				//console.log(putSpy);
+				guestbookstore.updateGreeting(5225978766819328,'guestbook message b', guestbookName).then(deferred.getTestCallback(function(result) {
+
+				}),
+				deferred.getTestCallback(function(error) {
+					doh.is(error.response.status, 404);
+				}));
+				this.server.respondWith([404, {'Content-Type': 'application/json'}, '']);
+				this.server.respond();
+				return deferred;
+			})
+		},
+		testUpdateGreetingInvalid: {
+
+			setUp: function() {
+				this.handles = [];
+			},
+			tearDown: function() {
+				array.forEach(this.handles, function(handle) {
+					handle.remove();
+				}, this);
+			},
+			runTest: sinon.test(function() {
+				var deferred = new doh.Deferred(),
+					guestbookName = "default_guestbook";
+				guestbookstore = new GuestbookStore({"guestbookName": guestbookName});
+				updateSpy = sinon.spy();
+				this.handles.push(topic.subscribe('/api/guestbook/default_guestbook/greeting/5225978766819328', updateSpy));
+				//console.log(putSpy);
+				guestbookstore.updateGreeting(5225978766819328,'guestbook message b', guestbookName).then(deferred.getTestCallback(function(result) {
+
+				}),
+				deferred.getTestCallback(function(error) {
+					doh.is(error.response.status, 400);
+				}));
+				this.server.respondWith([400, {'Content-Type': 'application/json'}, '']);
 				this.server.respond();
 				return deferred;
 			})
@@ -117,6 +229,40 @@ define([
 					return deferred;
 			})
 		},
+		testGetGreetingDetailFalse: {
+			setUp: function() {
+				this.handles = [];
+			},
+			tearDown: function() {
+				array.forEach(this.handles, function(handle) {
+					handle.remove();
+				}, this);
+			},
+			runTest: sinon.test(function() {
+				var deferred = new doh.Deferred(),
+					guestbookName = "default_guestbook";
+					guestbookstore = new GuestbookStore({"guestbookName": guestbookName});
+					results =
+						{"greeting_id": 6192449487634432, "updated_date": "2015-11-13 03:59:51.118471", "content": "guestbook message b", "user_info": "None", "is_admin": false, "updated_by": "", "date": "2015-11-13 03:59:51.118464", "guestbook_name": "default_guestbook"}
+					,
+					expected =
+						{"greeting_id": 6192449487634432, "updated_date": "2015-11-13 03:59:51.118471", "content": "guestbook message b", "user_info": "None", "is_admin": false, "updated_by": "", "date": "2015-11-13 03:59:51.118464", "guestbook_name": "default_guestbook"}
+					,
+					guestbookstore = new GuestbookStore({"guestbookName": guestbookName});
+					detailSpy = sinon.spy();
+					this.handles.push(topic.subscribe('/api/guestbook/default_guestbook/greeting/5225978766819328', detailSpy));
+					//console.log(putSpy);
+					guestbookstore.getGreetingDetail(5225978766819328, guestbookName).then(deferred.getTestCallback(function(result) {
+
+					}),
+					deferred.getTestCallback(function(error) {
+						doh.is(error.response.status, 404);
+					}));
+					this.server.respondWith([404, {'Content-Type': 'application/json'}, '']);
+					this.server.respond();
+					return deferred;
+			})
+		},
 		testDeleteGreeting: {
 			setUp: function() {
 				this.handles = [];
@@ -134,9 +280,37 @@ define([
 				this.handles.push(topic.subscribe('/api/guestbook/default_guestbook/greeting/5225978766819328', deleteSpy));
 				//console.log(putSpy);
 				guestbookstore.deleteGreeting(5225978766819328, guestbookName).then(deferred.getTestCallback(function(result) {
+					console.log(result);
 					doh.is(detailSpy.callCount, 0);
 				}));
-				this.server.respondWith([204, {'Content-Type': 'application/json'}, ', "']);
+				this.server.respondWith([204, {'Content-Type': 'application/json'}, '']);
+				this.server.respond();
+				return deferred;
+			})
+		},
+		testDeleteGreetingFalse: {
+			setUp: function() {
+				this.handles = [];
+			},
+			tearDown: function() {
+				array.forEach(this.handles, function(handle) {
+					handle.remove();
+				}, this);
+			},
+			runTest: sinon.test(function() {
+				var deferred = new doh.Deferred(),
+					guestbookName = "default_guestbook";
+				guestbookstore = new GuestbookStore({"guestbookName": guestbookName});
+				deleteSpy = sinon.spy();
+				this.handles.push(topic.subscribe('/api/guestbook/default_guestbook/greeting/5225978766819328', deleteSpy));
+				//console.log(putSpy);
+				guestbookstore.deleteGreeting(5225978766819328, guestbookName).then(deferred.getTestCallback(function(result) {
+
+				}),
+				deferred.getTestCallback(function(error) {
+					doh.is(error.response.status, 404);
+				}));
+				this.server.respondWith([404, {'Content-Type': 'application/json'}, '']);
 				this.server.respond();
 				return deferred;
 			})
