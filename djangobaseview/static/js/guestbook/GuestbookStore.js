@@ -7,7 +7,6 @@ define([
 	return declare([Stateful], {
 		jsonRest: null,
 		guestbookName: null,
-
 		constructor: function() {
 			this.watch("guestbookName", function(name, oldValue, value) {
 				if (oldValue !== value){
