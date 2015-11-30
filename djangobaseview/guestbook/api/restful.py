@@ -111,7 +111,7 @@ class ResourceSingle(JSONResponseMixin, FormView):
 		guestbook_name = kwargs.get('guestbook_name',Guestbook.get_default_guestbook())
 		greeting_id = kwargs.get('id', None)
 		detete_greeting_key = Greeting.delete_greeting(guestbook_name, greeting_id)
-		if detete_greeting_key is None:
+		if detete_greeting_key is True:
 			return HttpResponse(status=204)
 		else:
 			return HttpResponse(status=404)
