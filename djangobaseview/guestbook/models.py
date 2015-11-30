@@ -77,9 +77,11 @@ class Greeting(ndb.Model):
 	@classmethod
 	def delete_greeting(cls, guestbook_name, greeting_id):
 		greeting_key = cls.get_key_by_id(guestbook_name,greeting_id)
-		delete_greeting = greeting_key.delete()
+		greeting = greeting_key.get()
+		if greeting is None: return False
+		greeting_key.delete()
 		memcache.flush_all()
-		return delete_greeting
+		return True
 
 	@classmethod
 	def get_greeting_with_cursor(cls, url_safe, guestbook_name, count=20):
